@@ -1,7 +1,6 @@
-import { Suspense } from "react";
-import { getPublishedPosts } from "./lib/posts";
+import { getPublishedPosts } from "@/lib/posts";
 
-async function PostsList() {
+export async function PostsList() {
   const posts = await getPublishedPosts();
 
   if (posts.length === 0) {
@@ -19,15 +18,5 @@ async function PostsList() {
         </li>
       ))}
     </ul>
-  );
-}
-
-export default function HomePage() {
-  return (
-    <main>
-      <Suspense fallback={<p>Carregando posts...</p>}>
-        <PostsList />
-      </Suspense>
-    </main>
   );
 }

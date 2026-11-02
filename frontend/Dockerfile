@@ -10,7 +10,9 @@ FROM node:26 AS build
 WORKDIR /app
 
 COPY --from=dependencies /app/node_modules ./node_modules
-COPY . .
+COPY package.json package-lock.json next.config.ts tsconfig.json eslint.config.mjs next-env.d.ts ./
+COPY src ./src
+COPY public ./public
 RUN npm run build
 
 FROM node:26 AS runtime
