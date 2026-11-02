@@ -4,11 +4,11 @@ export async function PostsList() {
   const posts = await getPublishedPosts();
 
   if (posts.length === 0) {
-    return <p>Nenhum post publicado por enquanto.</p>;
+    return <p>There's no published posts yet.</p>;
   }
 
   return (
-    <ul>
+    <div>
       {posts.map((post) => (
         <li key={post.id}>
           <article>
@@ -17,6 +17,6 @@ export async function PostsList() {
           </article>
         </li>
       ))}
-    </ul>
+    </div>
   );
 }

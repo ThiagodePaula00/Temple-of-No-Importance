@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      target: development
+    user: "1000:1000"
+    environment:
+      NODE_ENV: development
+    command:
+      - ./node_modules/.bin/nodemon
+      - --legacy-watch
+      - --watch
+      - src
+      - --ext
+      - ts,json
+      - --exec
+      - npm run start
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      target: development
+    environment:
+      NODE_ENV: development
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next

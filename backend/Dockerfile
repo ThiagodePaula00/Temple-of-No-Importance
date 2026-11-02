@@ -1,3 +1,16 @@
+FROM node:26 AS development
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start:dev"]
+
 FROM node:26 AS build
 
 WORKDIR /app
