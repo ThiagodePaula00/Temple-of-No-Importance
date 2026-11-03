@@ -1,11 +1,11 @@
 import { format, formatDistanceToNow as dateFnsformatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 export function formatDatetime(rawDate: string): string {
     const date = new Date(rawDate);
 
     return format(date, "MM/dd/yyyy 'at' HH'h'mm", {
-        locale: ptBR,
+        locale: enUS,
     })
 }
 
@@ -13,7 +13,7 @@ export function formatDistanceToNow(rawDate: string): string {
     const date = new Date(rawDate);
 
     return dateFnsformatDistanceToNow(date, {
-        locale: ptBR,
+        locale: enUS,
         addSuffix: true,
     });
 }
@@ -22,7 +22,7 @@ export function formatHour(timestampMs: number): string {
   const date = new Date(timestampMs);
 
   return format(date, 'HH:mm:ss', {
-    locale: ptBR,
+    locale: enUS,
   });
 }
 

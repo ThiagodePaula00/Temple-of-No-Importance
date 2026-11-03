@@ -8,7 +8,7 @@ type PostCoverImageProps = {
 
 export function PostCoverImage({ imageProps, linkProps }: PostCoverImageProps) {
   return (
-        <Link {...linkProps} className={`w-full h-full overflow-hidden rounded-xl ${linkProps.className}`}>
+        <Link {...linkProps} className={`w-full h-full overflow-hidden ${linkProps.className}`}>
 
             <Image {...imageProps} className={`w-full h-full object-cover object-center group-hover:scale-105 transition ${imageProps.className}`} alt={imageProps.alt} />
         </Link>

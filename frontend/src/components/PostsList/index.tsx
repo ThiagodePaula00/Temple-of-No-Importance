@@ -1,18 +1,42 @@
-import { getPublishedPosts } from "@/lib/posts";
-import { TempPostCard } from "@/components/TempPostCard";
+import { PostModel } from '@/models/post/post-models';
+import { PostCoverImage } from '../PostCoverImage';
+import { PostSummary } from '../PostSummary';
 
-export async function PostsList() {
-  const posts = await getPublishedPosts();
+type PostsListProps = {
+    posts: PostModel[];
+};
 
-  if (posts.length === 0) {
-    return <p>There&apos;s no published posts yet.</p>;
-  }
+export function PostsList({ posts }: PostsListProps) {
+    if (posts.length === 0) return null;
 
-  return (
-    <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 px-6 py-10 sm:grid-cols-2 lg:grid-cols-3">
-      {posts.map((post) => (
-        <TempPostCard key={post.id} post={post} />
-      ))}
-    </div>
-  );
+    return (
+        <div className='grid w-full grid-cols-1 gap-8 py-10 sm:grid-cols-2 lg:grid-cols-3'>
+            {posts.map(post => {
+                const postLink = `/post/${post.slug}`;
+
+                return (
+                    <div className='flex flex-col gap-2 group bg-amber-700 rounded-xl overflow-hidden' key={post.id}>
+                        <PostCoverImage
+                            linkProps={{ href: postLink }}
+                            imageProps={{
+                                width: 1200,
+                                height: 720,
+                                src: post.coverImageUrl,
+                                alt: post.title,
+                            }}
+                        />
+                        <div className='p-4'>
+                          <PostSummary
+                              postLink={postLink}
+                              postHeading='h1'
+                              createdAt={post.createdAt}
+                              excerpt={post.excerpt}
+                              title={post.title}
+                          />
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
 }
