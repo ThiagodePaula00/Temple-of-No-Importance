@@ -15,7 +15,7 @@ export function PostsList({ posts }: PostsListProps) {
                 const postLink = `/post/${post.slug}`;
 
                 return (
-                    <div className='flex flex-col gap-2 group bg-amber-700 rounded-xl overflow-hidden' key={post.id}>
+                    <div className='flex flex-col gap-2 group bg-amber-700 rounded-sm overflow-hidden' key={post.id}>
                         <PostCoverImage
                             linkProps={{ href: postLink }}
                             imageProps={{
@@ -25,6 +25,7 @@ export function PostsList({ posts }: PostsListProps) {
                                 alt: post.title,
                             }}
                         />
+
                         <div className='p-4'>
                           <PostSummary
                               postLink={postLink}

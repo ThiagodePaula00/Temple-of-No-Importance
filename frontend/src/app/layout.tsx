@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import "./globals.css";
+import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
   title: {
@@ -17,6 +18,9 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   return (
     <html lang="en">
       <body>
+
+        <Header/>
+        
         {children}
       </body>
     </html>

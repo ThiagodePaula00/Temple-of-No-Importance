@@ -19,7 +19,7 @@ export function PostFeatured({ post }: PostFeaturedprops) {
     const postLink = `/post/${post.slug}`;
 
     return (
-        <section className='group grid w-full grid-cols-1 gap-6 sm:grid-cols-2 rounded-2xl overflow-hidden bg-amber-400'>
+        <section className='group grid w-full grid-cols-1 gap-6 sm:grid-cols-2 rounded-md overflow-hidden bg-amber-400'>
             <PostCoverImage
                 linkProps={{ href: postLink }}
                 imageProps={{
@@ -31,13 +31,15 @@ export function PostFeatured({ post }: PostFeaturedprops) {
                 }}
             />
 
-            <PostSummary
-                postLink={postLink}
-                postHeading='h1'
-                createdAt={post.createdAt}
-                excerpt={post.excerpt}
-                title={post.title}
-            />
+            <div className="px-4 flex flex-items-center py-6">
+                <PostSummary
+                    postLink={postLink}
+                    postHeading='h1'
+                    createdAt={post.createdAt}
+                    excerpt={post.excerpt}
+                    title={post.title}
+                />
+            </div>
         </section>
     );
 }
