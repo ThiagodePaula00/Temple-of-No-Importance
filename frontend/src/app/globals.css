@@ -11,6 +11,7 @@
   --control-border: #555555;
   --menu-background: #303030;
   --menu-border: #555555;
+  
 }
 
 :root[data-theme="light"] {

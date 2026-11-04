@@ -48,6 +48,7 @@ export function HeaderSearch({
           type="text"
         />
         <button
+        title="Search"
           aria-label="Focus search"
           className="header-search__button absolute top-1/2 right-auto left-1 grid size-8 min-h-8 min-w-8 -translate-y-1/2 cursor-pointer place-items-center rounded-full border-0 bg-transparent p-0 text-inherit lg:right-0.5 lg:left-auto lg:size-10 lg:min-h-10 lg:min-w-10"
           onClick={() => onOpenChange(true)}

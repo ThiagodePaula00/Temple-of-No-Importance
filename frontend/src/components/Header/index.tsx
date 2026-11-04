@@ -25,7 +25,7 @@ export function Header() {
         }`}
       >
         <h1 className="col-start-1 row-start-1 text-xl/normal transition-[font-size,line-height] duration-250 motion-reduce:transition-none sm:text-4xl/normal">
-          <Link className="whitespace-nowrap" href="/">
+          <Link className="whitespace-nowrap" href="/" title="Home">
             Temple of No Importance
           </Link>
         </h1>
