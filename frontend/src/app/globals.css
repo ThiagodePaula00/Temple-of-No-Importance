@@ -1,6 +1,27 @@
 @import "tailwindcss";
 
-body {
-  background-color: rgb(50, 51, 51); /*Temporary dark mode */
-  font-family: "Times New Roman", Times, serif;
+:root {
+  color-scheme: dark;
+  --page-background: #242424;
+  --text-color: #9b9a9a;
+  --muted-text-color: #c4c4c4;
+  --card-background: #343434;
+  --card-border: #1d1d1d;
+  --control-background: #3a3a3a;
+  --control-border: #555555;
+  --menu-background: #303030;
+  --menu-border: #555555;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --page-background: #eeeeee;
+  --text-color: #252525;
+  --muted-text-color: #555555;
+  --card-background: #dddddd;
+  --card-border: #b6b6b6;
+  --control-background: #e2e2e2;
+  --control-border: #b8b8b8;
+  --menu-background: #e5e5e5;
+  --menu-border: #b8b8b8;
 }

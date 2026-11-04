@@ -1,0 +1,37 @@
+.header-search {
+  transition:
+    width 320ms ease,
+    background-color 200ms ease,
+    border-color 200ms ease;
+  }
+  
+  .header-search__button {
+    transition:
+    right 320ms ease,
+    left 320ms ease;
+  }
+  
+  .header-search__input {
+    transition: opacity 160ms ease;
+    background-color: var(--card-background)
+}
+
+.header-search.is-open .header-search__input {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (min-width: 64rem) {
+  .header-search.is-open .header-search__button {
+    right: auto;
+    left: 0.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-search,
+  .header-search__button,
+  .header-search__input {
+    transition: none;
+  }
+}

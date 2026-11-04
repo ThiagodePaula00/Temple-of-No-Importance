@@ -8,7 +8,7 @@ export default function ErrorMessage({pageTitle='', contentTitle, content}: Erro
     return (
         <>
             {pageTitle && <title>{pageTitle}</title>}
-            <div className='min-h[320px] bg-slate-900 text-slate-100 mb-16 p-8 rounded-xl flex items-center justify-center text-center'>
+            <div className='mb-16 flex min-h-80 items-center justify-center rounded-xl border border-(--card-border)] bg-(--card-background) p-8 text-center text-(--text-color)'>
                 <div>
                     <h1 className="text-7xl/normal mb-4 font-extrabold">{contentTitle}</h1>
                     <div>

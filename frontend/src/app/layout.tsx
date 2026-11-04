@@ -17,10 +17,8 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   return (
     <html lang="en">
-      <body>
-
-        <Header/>
-        
+      <body className="min-h-screen bg-(--page-background) font-[Times_New_Roman,Times,serif] text-(--text-color) transition-colors duration-200">
+        <Header />
         {children}
       </body>
     </html>

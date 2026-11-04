@@ -8,8 +8,8 @@ type TempoPostCardProps = {
 
 export function TempPostCard({ post }: TempoPostCardProps) {
   return (
-    <article className="flex flex-col bg-amber-400 rounded-xl overflow-hidden">
-      <div className="relative aspect-5/3 w-full bg-slate-100">
+    <article className="flex flex-col overflow-hidden rounded-xl">
+      <div className="relative aspect-5/3 w-full bg-(--card-background)">
         <Image
           src={post.coverImageUrl}
           alt={`Capa do post: ${post.title}`}
@@ -19,11 +19,11 @@ export function TempPostCard({ post }: TempoPostCardProps) {
         />
       </div>
 
-      <div className="flex flex-col gap-2 p-4">
+      <div className="flex flex-col gap-2 border-r border-b border-l border-(--card-border) bg-(--card-background)] p-4 text-(--text-color) transition-colors duration-200">
         <PostDate dateTime={post.createdAt} />
         <h2 className="text-xl font-bold">{post.title}</h2>
         <p>{post.excerpt}</p>
-        <p className="text-sm text-slate-600">By {post.author}</p>
+        <p className="text-sm text-(--muted-text-color)">By {post.author}</p>
       </div>
     </article>
   );

@@ -5,5 +5,5 @@ type PostDateProps = {
 }
 
 export function PostDate({dateTime}: PostDateProps) {
-    return <time className="text-slate-600 text-sm/tight" dateTime={dateTime} title={formatDistanceToNow(dateTime)}> {formatDatetime(dateTime)}</time>
+    return <time className="text-sm/tight text-(--muted-text-color)" dateTime={dateTime} title={formatDistanceToNow(dateTime)}> {formatDatetime(dateTime)}</time>
 }
