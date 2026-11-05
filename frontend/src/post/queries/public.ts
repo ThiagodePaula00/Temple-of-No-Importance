@@ -19,7 +19,7 @@ export async function findPublicPostBySlugFromApi(slug: string) {
 
   if (!post) {
     return {
-      errors: ['Post não encontrado'],
+      errors: ['Post not found'],
       success: false as const,
       status: 404,
     };

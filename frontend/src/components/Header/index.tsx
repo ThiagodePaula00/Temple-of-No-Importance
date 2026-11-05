@@ -25,7 +25,11 @@ export function Header() {
         }`}
       >
         <h1 className="col-start-1 row-start-1 text-xl/normal transition-[font-size,line-height] duration-250 motion-reduce:transition-none sm:text-4xl/normal">
-          <Link className="whitespace-nowrap" href="/" title="Home">
+          <Link
+            className="cursor-pointer whitespace-nowrap transition-colors hover:text-[var(--muted-text-color)]"
+            href="/"
+            title="Home"
+          >
             Temple of No Importance
           </Link>
         </h1>
@@ -45,19 +49,34 @@ export function Header() {
           className="col-start-2 row-start-1 flex items-center lg:col-start-3"
         >
           <div className="hidden items-center gap-4 lg:flex">
-            <ToggleTheme className="flex flex-col items-center whitespace-nowrap bg-transparent p-0 text-xs font-normal text-inherit" />
-            <span className="flex flex-col items-center text-xs font-normal" title="About us">
+            <ToggleTheme className="flex flex-col items-center whitespace-nowrap bg-transparent p-0 text-xs font-normal text-inherit cursor-pointer transition-colors hover:text-(--muted-text-color)" />
+            
+            <Link
+              className="flex cursor-pointer flex-col items-center border-0 bg-transparent p-0 text-xs font-normal text-inherit transition-colors hover:text-(--muted-text-color)"
+              href="/about"
+              title="About us"
+            >
               <BookTextIcon aria-hidden="true" />
               <span>About us</span>
-            </span>
-            <span className="flex flex-col items-center text-xs font-normal" title="Sign up">
+            </Link>
+
+            <Link
+              className="flex cursor-pointer flex-col items-center border-0 bg-transparent p-0 text-xs font-normal text-inherit transition-colors hover:text-(--muted-text-color)"
+              href="/sign-up"
+              title="Sign up"
+            >
               <UserPlusIcon aria-hidden="true" />
               <span>Sign up</span>
-            </span>
-            <span className="flex flex-col items-center text-xs font-normal" title="Sign in">
+            </Link>
+
+            <Link
+              className="flex cursor-pointer flex-col items-center border-0 bg-transparent p-0 text-xs font-normal text-inherit transition-colors hover:text-(--muted-text-color)"
+              href="/sign-in"
+              title="Sign in"
+            >
               <KeyRoundIcon aria-hidden="true" />
               <span>Sign in</span>
-            </span>
+            </Link>
           </div>
           <HeaderMenu />
         </nav>

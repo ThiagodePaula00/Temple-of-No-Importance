@@ -28,7 +28,7 @@ export function HeaderSearch({
       <div
         className={`header-search relative flex h-8 w-8 flex-col items-center justify-center overflow-visible rounded-full border border-transparent bg-transparent lg:ml-auto lg:h-13 lg:w-11 lg:flex-row lg:justify-start lg:overflow-hidden ${
           isOpen
-            ? "is-open h-13 w-full overflow-hidden rounded-full border-(--control-border) bg-[var(--control-background) lg:w-full"
+            ? "is-open h-13 w-full overflow-hidden rounded-full border-(--control-border) bg-var(--control-background) lg:w-full"
             : ""
         }`}
       >
@@ -48,9 +48,9 @@ export function HeaderSearch({
           type="text"
         />
         <button
-        title="Search"
+          title="Search"
           aria-label="Focus search"
-          className="header-search__button absolute top-1/2 right-auto left-1 grid size-8 min-h-8 min-w-8 -translate-y-1/2 cursor-pointer place-items-center rounded-full border-0 bg-transparent p-0 text-inherit lg:right-0.5 lg:left-auto lg:size-10 lg:min-h-10 lg:min-w-10"
+          className="header-search__button absolute top-1/2 right-auto left-1 grid size-8 min-h-8 min-w-8 -translate-y-1/2 cursor-pointer place-items-center rounded-full border-0 bg-transparent p-0 text-inherit transition-colors hover:text-[var(--muted-text-color)] lg:right-0.5 lg:left-auto lg:size-10 lg:min-h-10 lg:min-w-10"
           onClick={() => onOpenChange(true)}
           type="button"
         >

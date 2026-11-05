@@ -53,7 +53,7 @@ export function ToggleTheme({ className }: ToggleThemeProps) {
   return (
     <button
       aria-label={nextThemeLabel}
-      className={className}
+      className={`${className} cursor-pointer transition-colors hover:text-(--muted-text-color)`}
       onClick={toggleTheme}
       title={nextThemeLabel}
       type="button"
