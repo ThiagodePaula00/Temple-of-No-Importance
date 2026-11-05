@@ -3,7 +3,12 @@ import { Repository } from 'typeorm';
 import { resolve } from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { Post } from './post.entity.js';
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
 
 type PostSeed = {
   posts: Array<
@@ -44,5 +49,17 @@ export class PostsService implements OnApplicationBootstrap {
       where: { published: true },
       order: { createdAt: "DESC" },
     });
+  }
+
+  async findPublishedBySlug(slug: string) {
+    const post = await this.postsRepository.findOne({
+      where: { slug, published: true },
+    });
+
+    if (!post) {
+      throw new NotFoundException("Post not found");
+    }
+
+    return post;
   }
 }

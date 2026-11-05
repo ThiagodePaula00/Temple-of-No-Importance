@@ -1,4 +1,4 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Param } from "@nestjs/common";
 import { PostsService } from "./post.service.js";
 
 
@@ -9,5 +9,10 @@ export class PostController {
     @Get()
     findPublished() {
         return this.postsService.findPublished();
+    }
+
+    @Get(":slug")
+    findPublishedBySlug(@Param("slug") slug: string) {
+        return this.postsService.findPublishedBySlug(slug);
     }
 }

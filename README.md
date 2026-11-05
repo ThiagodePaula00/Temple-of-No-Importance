@@ -48,3 +48,21 @@ In this mode, source changes require rebuilding and recreating the application c
 ## Run locally
 
 To develop without Docker, install dependencies in `backend/` and `frontend/` with `npm ci`, then start each application from its directory with `npm run start:dev` (backend) and `npm run dev -- --port 3001` (frontend). PostgreSQL must be available separately if the application uses it.
+
+## Math in post content
+
+Post content is written in Markdown. Use single dollar signs for inline math:
+
+```md
+Einstein's equation is $E = mc^2$.
+```
+
+Use double dollar signs on separate lines for a displayed equation:
+
+```md
+$$
+\frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+$$
+```
+
+The public post page renders these expressions with KaTeX. The current frontend does not yet include a post-writing form; these examples apply wherever post Markdown content is entered or edited.

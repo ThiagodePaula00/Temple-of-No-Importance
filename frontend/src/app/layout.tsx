@@ -3,6 +3,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Container } from "@/components/Container";
+import "katex/dist/katex.min.css";
 
 export const metadata: Metadata = {
   title: {
