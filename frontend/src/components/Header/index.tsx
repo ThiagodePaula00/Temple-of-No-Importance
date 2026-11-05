@@ -3,6 +3,9 @@
 import {
   BookTextIcon,
   KeyRoundIcon,
+  LogOutIcon,
+  PlusIcon,
+  ShieldUserIcon,
   UserPlusIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -60,22 +63,54 @@ export function Header() {
               <span>About us</span>
             </Link>
 
+            {/* restrained rout */}
             <Link
+              className="flex cursor-pointer flex-col items-center border-0 bg-transparent p-0 text-xs font-normal text-inherit transition-colors hover:text-(--muted-text-color)"
+              href="/admin"
+              title="Admin"
+            >
+              <ShieldUserIcon aria-hidden="true" />
+              <span>Admin</span>
+            </Link>
+
+            {/* {Temporaraly suspensed} */}
+            {/* <Link
               className="flex cursor-pointer flex-col items-center border-0 bg-transparent p-0 text-xs font-normal text-inherit transition-colors hover:text-(--muted-text-color)"
               href="/sign-up"
               title="Sign up"
             >
               <UserPlusIcon aria-hidden="true" />
               <span>Sign up</span>
-            </Link>
+            </Link> */}
 
-            <Link
+            {/* {Temporaraly suspensed} */}
+            {/* <Link
               className="flex cursor-pointer flex-col items-center border-0 bg-transparent p-0 text-xs font-normal text-inherit transition-colors hover:text-(--muted-text-color)"
               href="/sign-in"
               title="Sign in"
             >
               <KeyRoundIcon aria-hidden="true" />
               <span>Sign in</span>
+            </Link> */}
+
+            {/* restrained rout */}
+            <Link
+              className="flex cursor-pointer flex-col items-center border-0 bg-transparent p-0 text-xs font-normal text-inherit transition-colors hover:text-(--muted-text-color)"
+              href="/post/new"
+              title="New post"
+            >
+              <PlusIcon aria-hidden="true" />
+              <span>New post</span>
+            </Link>
+
+            {/* restrained rout */}
+            <Link
+              className="flex cursor-pointer flex-col items-center border-0 bg-transparent p-0 text-xs font-normal text-inherit transition-colors hover:text-(--muted-text-color)"
+              href="/logout"
+              title="Log out"
+            >
+              <LogOutIcon aria-hidden="true" />
+              <span>Log out</span>
             </Link>
           </div>
           <HeaderMenu />
