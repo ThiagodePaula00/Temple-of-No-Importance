@@ -15,7 +15,7 @@ export function PostsList({ posts }: PostsListProps) {
                 const postLink = `/post/${post.slug}`;
 
                 return (
-                    <div className='group flex flex-col gap-0 overflow-hidden rounded-xl' key={post.id}>
+                    <div className='group flex flex-col shadow-lg gap-0 overflow-hidden rounded-xl' key={post.id}>
                         <PostCoverImage
                             linkProps={{ href: postLink }}
                             imageProps={{

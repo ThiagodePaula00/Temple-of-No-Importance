@@ -6,7 +6,7 @@ export function Footer() {
     return (
         <footer className="py-16 text-center">
             <p>
-                <span>
+                <span className="hover:text-(--muted-text-color)">
                     Copyright &copy; {currentYear} - <Link href='/'>Temple of No Importance</Link>
                 </span>
             </p>

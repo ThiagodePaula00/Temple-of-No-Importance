@@ -26,7 +26,7 @@ export function Header() {
       >
         <h1 className="col-start-1 row-start-1 text-xl/normal transition-[font-size,line-height] duration-250 motion-reduce:transition-none sm:text-4xl/normal">
           <Link
-            className="cursor-pointer whitespace-nowrap transition-colors hover:text-[var(--muted-text-color)]"
+            className="cursor-pointer whitespace-nowrap transition-colors hover:text-(--muted-text-color)"
             href="/"
             title="Home"
           >

@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Container } from "@/components/Container";
 
 export const metadata: Metadata = {
   title: {
@@ -17,11 +18,17 @@ type RootLayoutProps = {
 
 export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-(--page-background) font-[Times_New_Roman,Times,serif] text-(--text-color) transition-colors duration-200">
-        <Header />
-        {children}
-        <Footer/>
+    <html lang="en" className="dark">
+      <body>
+        <Container>
+
+          <Header />
+
+          {children}
+
+          <Footer/>
+
+        </Container>
       </body>
     </html>
   )
