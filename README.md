@@ -10,7 +10,7 @@ Prerequisites: Docker and the Docker Compose plugin.
    cp backend/.env.example backend/.env
    ```
 
-2. Open `backend/.env` and replace `POSTGRES_PASSWORD` with your chosen password. Configure the database environment variables in this file, not in the Dockerfile or Compose file. Compose reads it to configure PostgreSQL and makes the same values available to the backend. `backend/.env` is a local file and must not be shared or committed; only `backend/.env.example`, without a real password, belongs in the repository.
+2. Open `backend/.env` and replace `POSTGRES_PASSWORD` with your chosen password. Set `JWT_SECRET_KEY` to a random secret of at least 32 characters (for example, generate one with `openssl rand -base64 48`). Configure the database and JWT environment variables in this file, not in the Dockerfile or Compose file. Compose reads it to configure PostgreSQL and makes the same values available to the backend. `backend/.env` is a local file and must not be shared or committed; only `backend/.env.example`, without real secrets, belongs in the repository.
 3. From the project root, start PostgreSQL, the backend, and the frontend with one command:
 
    ```sh
@@ -21,17 +21,36 @@ Prerequisites: Docker and the Docker Compose plugin.
 
    To run the services in the background, use `docker compose up --build -d`.
 
-   If you change a `package.json` or lockfile and add/remove dependencies, rebuild and refresh the container dependency volumes:
+   If you change the backend dependencies, rebuild the backend image:
 
    ```sh
-   docker compose up --build --renew-anon-volumes
+   docker compose up -d --build backend
    ```
+
+   Frontend dependencies are stored in the named `frontend_node_modules` volume. To refresh that volume after changing the frontend lockfile, stop the frontend, install from its lockfile in a one-off container, and start it again:
+
+   ```sh
+   docker compose stop frontend
+   docker compose run --rm --no-deps frontend npm ci
+   docker compose up -d --build frontend
+   ```
+
+   Do not use `docker compose down -v` for routine dependency refreshes: it also deletes the PostgreSQL data volume.
 
 - Frontend: <http://localhost:3001>
 - Backend: <http://localhost:3000>
 - PostgreSQL: `localhost:5432` (default port)
 
 Compose waits for PostgreSQL to become healthy before starting the backend. Database data is persisted in the `postgres_data` volume. The images use Node.js 26 and PostgreSQL 18. PostgreSQL uses the database and username defined in `backend/.env`; those values are also available to the backend, with `DB_HOST=postgres` and `DB_PORT=5432` for container-to-container connections.
+
+## Accounts and administration
+
+- Create an account at <http://localhost:3001/sign-up> and sign in at <http://localhost:3001/sign-in>.
+- The first account registered in an empty database receives administrator access. Later registrations are regular accounts and cannot access the admin area or modify posts.
+- The protected admin area is <http://localhost:3001/admin>. Create posts at `/admin/post/new`; manage posts and your account from the admin navigation.
+- Automatic sample-data seeding has been removed. Posts already stored in the PostgreSQL volume are preserved and are not deleted by this change.
+- The sign-in page links to `/forgot-password`, but email-based recovery is not configured. Contact the site administrator if access must be recovered.
+- Cover images currently use a publicly reachable URL. File upload needs a durable storage service and is not enabled.
 
 To stop the services, run `docker compose down`. To also remove the persisted database data, run `docker compose down -v`.
 
@@ -65,4 +84,4 @@ $$
 $$
 ```
 
-The public post page renders these expressions with KaTeX. The current frontend does not yet include a post-writing form; these examples apply wherever post Markdown content is entered or edited.
+The public post page renders these expressions with KaTeX. Administrators can enter Markdown in the post creation and editing forms.

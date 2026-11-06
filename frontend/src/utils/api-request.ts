@@ -56,8 +56,8 @@ export async function apiRequest<T>(
     return {
       errors: [
         err instanceof Error
-          ? `Falha ao conectar-se à API: ${err.message}`
-          : 'Falha ao conectar-se à API',
+          ? `Failed to connect to the API: ${err.message}`
+          : 'Failed to connect to the API',
       ],
       success: false,
       status: 500,

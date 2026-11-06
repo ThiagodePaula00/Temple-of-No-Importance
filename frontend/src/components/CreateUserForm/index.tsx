@@ -1,13 +1,21 @@
 'use client';
 
+import { createUserAction } from '@/actions/login/create-user-action';
 import { UserRoundIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useActionState } from 'react';
 
 export default function CreateUserForm() {
+  const [state, action, isPending] = useActionState(createUserAction, {
+    name: '',
+    email: '',
+    errors: [],
+  });
+
   return (
-    <div className="flex items-center justify-center mx-auto mt-16 mb-32 max-w-sm rounded-xl border border-(--card-border) bg-(--card-background) p-8 shadow-lg text-center">
-      <form className="flex flex-1 flex-col gap-6">
-        <h2 className="text-2xl font-bold tracking-tight">Create Account</h2>
+    <div className="mx-auto my-16 mb-32 max-w-sm rounded-xl border border-(--card-border) bg-(--card-background) p-8 text-center shadow-lg">
+      <form action={action} className="flex flex-col gap-6">
+        <h2 className="text-2xl font-bold tracking-tight">Create account</h2>
 
         <div className="relative">
           <input
@@ -16,7 +24,10 @@ export default function CreateUserForm() {
             type="text"
             placeholder=" "
             required
-            className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500"
+            autoComplete="name"
+            defaultValue={state.name}
+            disabled={isPending}
+            className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500 disabled:opacity-60"
           />
           <label
             htmlFor="name"
@@ -33,7 +44,10 @@ export default function CreateUserForm() {
             type="email"
             placeholder=" "
             required
-            className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500"
+            autoComplete="email"
+            defaultValue={state.email}
+            disabled={isPending}
+            className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500 disabled:opacity-60"
           />
           <label
             htmlFor="email"
@@ -50,7 +64,10 @@ export default function CreateUserForm() {
             type="password"
             placeholder=" "
             required
-            className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500"
+            autoComplete="new-password"
+            minLength={8}
+            disabled={isPending}
+            className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500 disabled:opacity-60"
           />
           <label
             htmlFor="password"
@@ -63,11 +80,14 @@ export default function CreateUserForm() {
         <div className="relative">
           <input
             id="password2"
-            name="password2"
+            name="passwordConfirmation"
             type="password"
             placeholder=" "
             required
-            className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500"
+            autoComplete="new-password"
+            minLength={8}
+            disabled={isPending}
+            className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500 disabled:opacity-60"
           />
           <label
             htmlFor="password2"
@@ -77,12 +97,19 @@ export default function CreateUserForm() {
           </label>
         </div>
 
+        {state.errors.length > 0 && (
+          <ul className="list-inside list-disc text-left text-sm text-red-500" role="alert">
+            {state.errors.map((error) => <li key={error}>{error}</li>)}
+          </ul>
+        )}
+
         <button
+          disabled={isPending}
           type="submit"
-          className="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 font-semibold text-white transition-colors hover:bg-blue-700"
+          className="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60"
         >
           <UserRoundIcon size={18} />
-          Create Account
+          {isPending ? 'Creating account…' : 'Create account'}
         </button>
 
         <p className="text-sm text-(--muted-text-color)">

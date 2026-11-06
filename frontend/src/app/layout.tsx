@@ -3,7 +3,11 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Container } from "@/components/Container";
+import { ToastifyContainer } from "@/components/ToastifyContainer";
+import { ToggleThemeProvider } from "@/components/ToggleTheme";
+import { getCurrentUser } from "@/lib/login/manage-login";
 import "katex/dist/katex.min.css";
+import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: {
@@ -17,19 +21,22 @@ type RootLayoutProps = {
   children: React.ReactNode;
 };
 
-export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
+export default async function RootLayout({ children }: Readonly<RootLayoutProps>) {
+  const user = await getCurrentUser();
   return (
     <html lang="en">
       <body>
-        <Container>
+        <ToggleThemeProvider>
+          <Container>
+            <Header isAuthenticated={Boolean(user)} isAdmin={user?.isAdmin ?? false} />
 
-          <Header />
+            {children}
 
-          {children}
+            <Footer />
 
-          <Footer/>
-
-        </Container>
+          </Container>
+          <ToastifyContainer />
+        </ToggleThemeProvider>
       </body>
     </html>
   )

@@ -1,13 +1,20 @@
 'use client';
 
+import { loginAction } from '@/actions/login/login-action';
 import { KeyRoundIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useActionState } from 'react';
 
 export default function LoginForm() {
+  const [state, action, isPending] = useActionState(loginAction, {
+    email: '',
+    errors: [],
+  });
+
   return (
-    <div className="flex items-center justify-center mx-auto mt-16 mb-32 max-w-sm rounded-xl border border-(--card-border) bg-(--card-background) p-8 shadow-lg text-center">
-      <form className="flex flex-1 flex-col gap-6">
-        <h2 className="text-2xl font-bold tracking-tight">Sign In</h2>
+    <div className="mx-auto my-16 mb-32 max-w-sm rounded-xl border border-(--card-border) bg-(--card-background) p-8 text-center shadow-lg">
+      <form action={action} className="flex flex-col gap-6">
+        <h2 className="text-2xl font-bold tracking-tight">Sign in</h2>
 
         <div className="relative">
           <input
@@ -16,7 +23,10 @@ export default function LoginForm() {
             type="email"
             placeholder=" "
             required
-            className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500"
+            autoComplete="email"
+            defaultValue={state.email}
+            disabled={isPending}
+            className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500 disabled:opacity-60"
           />
           <label
             htmlFor="email"
@@ -34,7 +44,9 @@ export default function LoginForm() {
               type="password"
               placeholder=" "
               required
-              className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500"
+              autoComplete="current-password"
+              disabled={isPending}
+              className="peer w-full rounded-md border border-(--control-border) bg-(--control-background) px-3 pt-3.5 pb-2 text-inherit outline-none transition-colors focus:border-blue-500 disabled:opacity-60"
             />
             <label
               htmlFor="password"
@@ -54,17 +66,24 @@ export default function LoginForm() {
           </div>
         </div>
 
+        {state.errors.length > 0 && (
+          <ul className="list-inside list-disc text-left text-sm text-red-500" role="alert">
+            {state.errors.map((error) => <li key={error}>{error}</li>)}
+          </ul>
+        )}
+
         <button
+          disabled={isPending}
           type="submit"
-          className="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 font-semibold text-white transition-colors hover:bg-blue-700"
+          className="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60"
         >
           <KeyRoundIcon size={18} />
-          Sign In
+          {isPending ? 'Signing in…' : 'Sign in'}
         </button>
 
         <p className="text-sm text-(--muted-text-color)">
-          Don't have an account?{' '}
-          <Link href="sign-up" className="font-semibold text-inherit underline hover:text-(--text-color)">
+          Don&apos;t have an account?{' '}
+          <Link href="/sign-up" className="font-semibold text-inherit underline hover:text-(--text-color)">
             Sign Up
           </Link>
         </p>

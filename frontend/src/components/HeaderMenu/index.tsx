@@ -2,19 +2,29 @@
 
 import {
   BookTextIcon,
+  KeyRoundIcon,
   LogOutIcon,
   MenuIcon,
   PlusIcon,
   ShieldUserIcon,
+  UserPlusIcon,
   XIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { logoutAction } from "@/actions/login/logout-action";
 import { ToggleTheme } from "@/components/ToggleTheme";
 
-export function HeaderMenu() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+type HeaderMenuProps = {
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+};
 
+const itemClass =
+  "flex items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)";
+
+export function HeaderMenu({ isAuthenticated, isAdmin }: HeaderMenuProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
@@ -33,85 +43,63 @@ export function HeaderMenu() {
       {isMenuOpen && (
         <ul
           aria-label="Header options"
-          className="absolute top-full right-6 z-10 mt-2 grid gap-3 rounded-md border border-(--menu-border) bg-(--menu-background) p-4 text-base font-normal shadow-lg lg:hidden"
+          className="absolute top-full right-6 z-10 mt-2 grid min-w-44 gap-3 rounded-md border border-(--menu-border) bg-(--menu-background) p-4 text-base font-normal shadow-lg lg:hidden"
           id="mobile-header-menu"
         >
           <li>
-
-            <ToggleTheme className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)" />
+            <ToggleTheme className={`${itemClass} cursor-pointer`} />
           </li>
-
           <li>
-            <Link
-              className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
-              href="/about"
-              onClick={closeMenu}
-              title="about us"
-            >
+            <Link className={itemClass} href="/about" onClick={closeMenu}>
               <BookTextIcon aria-hidden="true" />
               <span>About us</span>
             </Link>
           </li>
-
-          {/* admin */}
-          <li>
-            <Link
-              className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
-              href="/admin"
-              onClick={closeMenu}
-              title="admin"
-            >
-              <ShieldUserIcon aria-hidden="true" />
-              <span>Admin</span>
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
-              href="/post/new"
-              onClick={closeMenu}
-              title="New Post"
-            >
-              <PlusIcon aria-hidden="true" />
-              <span>New Post</span>
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
-              href="/about"
-              onClick={closeMenu}
-              title="Log out"
-            >
-              <LogOutIcon aria-hidden="true" />
-              <span>Log out</span>
-            </Link>
-          </li>
-
-          {/* <li>
-            <Link
-              className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
-              href="/sign-in"
-              onClick={closeMenu}
-            >
-              <KeyRoundIcon aria-hidden="true" />
-              <span>Sign in</span>
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
-              href="/sign-up"
-              onClick={closeMenu}
-            >
-              <UserPlusIcon aria-hidden="true" />
-              <span>Sign up</span>
-            </Link>
-          </li> */}
-
+          {isAdmin && (
+            <>
+              <li>
+                <Link className={itemClass} href="/admin" onClick={closeMenu}>
+                  <ShieldUserIcon aria-hidden="true" />
+                  <span>Admin</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className={itemClass}
+                  href="/admin/post/new"
+                  onClick={closeMenu}
+                >
+                  <PlusIcon aria-hidden="true" />
+                  <span>Create post</span>
+                </Link>
+              </li>
+            </>
+          )}
+          {isAuthenticated ? (
+            <li>
+              <form action={logoutAction}>
+                <button className={itemClass} type="submit">
+                  <LogOutIcon aria-hidden="true" />
+                  <span>Log out</span>
+                </button>
+              </form>
+            </li>
+          ) : (
+            <>
+              <li>
+                <Link className={itemClass} href="/sign-in" onClick={closeMenu}>
+                  <KeyRoundIcon aria-hidden="true" />
+                  <span>Sign in</span>
+                </Link>
+              </li>
+              <li>
+                <Link className={itemClass} href="/sign-up" onClick={closeMenu}>
+                  <UserPlusIcon aria-hidden="true" />
+                  <span>Sign up</span>
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
       )}
     </>

@@ -38,6 +38,16 @@ export function ToggleThemeProvider({ children }: ToggleThemeProviderProps) {
   );
 }
 
+export function useTheme() {
+  const themeContext = useContext(ThemeContext);
+
+  if (!themeContext) {
+    throw new Error("useTheme must be used inside ToggleThemeProvider");
+  }
+
+  return themeContext.theme;
+}
+
 export function ToggleTheme({ className }: ToggleThemeProps) {
   const themeContext = useContext(ThemeContext);
 

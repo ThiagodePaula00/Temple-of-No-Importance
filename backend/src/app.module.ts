@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from './posts/post.entity.js';
 import { HealthController } from './health/health.controller.js';
 import { PostModule } from './posts/posts.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { User } from './users/user.entity.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -18,12 +20,13 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       username: process.env.POSTGRES_USER ?? "posts",
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB?? "posts",
-      entities: [Post],
+      entities: [Post, User],
       synchronize: process.env.TYPEORM_SYNCHRONIZE !== "false",
       retryAttempts: 10,
       retryDelay: 3000,
     }),
     PostModule,
+    AuthModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],
