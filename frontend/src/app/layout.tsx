@@ -19,7 +19,7 @@ type RootLayoutProps = {
 
 export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body>
         <Container>
 
