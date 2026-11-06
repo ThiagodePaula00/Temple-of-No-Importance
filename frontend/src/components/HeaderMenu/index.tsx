@@ -2,9 +2,10 @@
 
 import {
   BookTextIcon,
-  KeyRoundIcon,
+  LogOutIcon,
   MenuIcon,
-  UserPlusIcon,
+  PlusIcon,
+  ShieldUserIcon,
   XIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -39,17 +40,57 @@ export function HeaderMenu() {
 
             <ToggleTheme className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)" />
           </li>
+
           <li>
             <Link
               className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
               href="/about"
               onClick={closeMenu}
+              title="about us"
             >
               <BookTextIcon aria-hidden="true" />
               <span>About us</span>
             </Link>
           </li>
+
+          {/* admin */}
           <li>
+            <Link
+              className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
+              href="/admin"
+              onClick={closeMenu}
+              title="admin"
+            >
+              <ShieldUserIcon aria-hidden="true" />
+              <span>Admin</span>
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
+              href="/post/new"
+              onClick={closeMenu}
+              title="New Post"
+            >
+              <PlusIcon aria-hidden="true" />
+              <span>New Post</span>
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
+              href="/about"
+              onClick={closeMenu}
+              title="Log out"
+            >
+              <LogOutIcon aria-hidden="true" />
+              <span>Log out</span>
+            </Link>
+          </li>
+
+          {/* <li>
             <Link
               className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
               href="/sign-in"
@@ -59,6 +100,7 @@ export function HeaderMenu() {
               <span>Sign in</span>
             </Link>
           </li>
+
           <li>
             <Link
               className="flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color)"
@@ -68,7 +110,8 @@ export function HeaderMenu() {
               <UserPlusIcon aria-hidden="true" />
               <span>Sign up</span>
             </Link>
-          </li>
+          </li> */}
+
         </ul>
       )}
     </>
