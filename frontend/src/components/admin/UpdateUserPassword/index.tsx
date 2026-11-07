@@ -2,12 +2,14 @@
 
 import { useActionState } from "react";
 import { updateUserPasswordAction } from "@/actions/user/update-user-password-action";
+import { useActionToast } from "@/hooks/use-action-toast";
 
 export function UpdateUserPassword() {
   const [state, action, isPending] = useActionState(updateUserPasswordAction, {
     errors: [],
     success: false,
   });
+  useActionToast(state, "Password changed.");
 
   return (
     <form action={action} className="mx-auto grid max-w-md gap-5">
@@ -29,12 +31,10 @@ export function UpdateUserPassword() {
           />
         </label>
       ))}
-      {state.errors.length > 0 && (
-        <ul className="list-inside list-disc text-sm text-red-500" role="alert">
-          {state.errors.map((error) => <li key={error}>{error}</li>)}
-        </ul>
-      )}
-      {state.success && <p role="status">Password changed.</p>}
+      <p className="text-sm text-(--muted-text-color)">
+        Use at least 8 characters, including uppercase and lowercase letters,
+        a number, and a special character.
+      </p>
       <button
         className="justify-self-start rounded-md bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
         disabled={isPending}

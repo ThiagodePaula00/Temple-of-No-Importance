@@ -13,14 +13,17 @@ export type AdminPostInput = z.infer<typeof AdminPostSchema>;
 export type PostActionState = {
   fields: AdminPostInput;
   errors: string[];
+  success: boolean;
 };
 
 export function readPostFormFields(formData: FormData): AdminPostInput {
+  const status = String(formData.get("published") ?? "");
+
   return {
     title: String(formData.get("title") ?? ""),
     excerpt: String(formData.get("excerpt") ?? ""),
     content: String(formData.get("content") ?? ""),
     coverImageUrl: String(formData.get("coverImageUrl") ?? ""),
-    published: formData.get("published") === "on",
+    published: status === "published" || status === "true" || status === "on",
   };
 }

@@ -16,12 +16,15 @@ export async function authenticatedApiRequest<T>(
     };
   }
 
-  const headers = new Headers(options?.headers);
-  headers.set("Authorization", `Bearer ${token}`);
+  const sendRequest = (accessToken: string) => {
+    const headers = new Headers(options?.headers);
+    headers.set("Authorization", `Bearer ${accessToken}`);
+    return apiRequest<T>(path, {
+      ...options,
+      headers,
+      cache: "no-store",
+    });
+  };
 
-  return apiRequest<T>(path, {
-    ...options,
-    headers,
-    cache: "no-store",
-  });
+  return sendRequest(token);
 }

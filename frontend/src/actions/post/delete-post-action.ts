@@ -1,6 +1,6 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { authenticatedApiRequest } from "@/utils/authenticated-api-request";
 
 export async function deletePostAction(id: string) {
@@ -10,8 +10,10 @@ export async function deletePostAction(id: string) {
   );
 
   if (!response.success) {
-    return { error: response.errors.join(", ") };
+    return { success: false, error: response.errors.join(", ") };
   }
 
-  redirect("/admin?deleted=1");
+  revalidatePath("/admin");
+  revalidatePath("/");
+  return { success: true };
 }

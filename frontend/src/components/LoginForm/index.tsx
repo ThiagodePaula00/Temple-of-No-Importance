@@ -4,12 +4,14 @@ import { loginAction } from '@/actions/login/login-action';
 import { KeyRoundIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useActionState } from 'react';
+import { useActionToast } from '@/hooks/use-action-toast';
 
 export default function LoginForm() {
   const [state, action, isPending] = useActionState(loginAction, {
     email: '',
     errors: [],
   });
+  useActionToast({ ...state, success: false }, '');
 
   return (
     <div className="mx-auto my-16 mb-32 max-w-sm rounded-xl border border-(--card-border) bg-(--card-background) p-8 text-center shadow-lg">
@@ -65,12 +67,6 @@ export default function LoginForm() {
             </Link>
           </div>
         </div>
-
-        {state.errors.length > 0 && (
-          <ul className="list-inside list-disc text-left text-sm text-red-500" role="alert">
-            {state.errors.map((error) => <li key={error}>{error}</li>)}
-          </ul>
-        )}
 
         <button
           disabled={isPending}

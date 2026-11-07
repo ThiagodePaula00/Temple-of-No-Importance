@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { logoutAction } from "@/actions/login/logout-action";
+import { ConfirmLogoutButton } from "@/components/ConfirmLogoutButton";
 import { HeaderMenu } from "@/components/HeaderMenu";
 import { HeaderSearch } from "@/components/Search";
 import { ToggleTheme } from "@/components/ToggleTheme";
@@ -82,12 +82,12 @@ export function Header({ isAuthenticated, isAdmin }: HeaderProps) {
           )}
 
           {isAuthenticated ? (
-            <form action={logoutAction}>
-              <button className={iconLinkClass} title="Log out" type="submit">
+            <div>
+              <ConfirmLogoutButton className={iconLinkClass}>
                 <LogOutIcon aria-hidden="true" />
                 <span>Log out</span>
-              </button>
-            </form>
+              </ConfirmLogoutButton>
+            </div>
           ) : (
             <>
               <Link className={iconLinkClass} href="/sign-in" title="Sign in">

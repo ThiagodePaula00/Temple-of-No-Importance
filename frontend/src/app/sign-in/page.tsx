@@ -1,4 +1,5 @@
 import LoginForm from "@/components/LoginForm";
+import { ToastMessage } from "@/components/ToastMessage";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -6,22 +7,21 @@ export const metadata: Metadata = {
 };
 
 type SignInPageProps = {
-  searchParams: Promise<{ created?: string }>;
+  searchParams: Promise<{ created?: string; accountDeleted?: string }>;
 };
 
 export default async function SignInPage({ searchParams }: SignInPageProps) {
-  const { created } = await searchParams;
+  const { created, accountDeleted } = await searchParams;
+  const notification =
+    created === "1"
+      ? "Account created. You can sign in now."
+      : accountDeleted === "1"
+        ? "Your account has been deleted."
+        : null;
 
   return (
     <>
-      {created === "1" && (
-        <p
-          className="mx-auto mt-10 max-w-sm rounded-md border border-(--card-border) bg-(--card-background) p-3 text-center text-sm"
-          role="status"
-        >
-          Account created. You can sign in now.
-        </p>
-      )}
+      {notification && <ToastMessage message={notification} />}
       <LoginForm />
     </>
   );

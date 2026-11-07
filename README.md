@@ -48,6 +48,9 @@ Compose waits for PostgreSQL to become healthy before starting the backend. Data
 - Create an account at <http://localhost:3001/sign-up> and sign in at <http://localhost:3001/sign-in>.
 - The first account registered in an empty database receives administrator access. Later registrations are regular accounts and cannot access the admin area or modify posts.
 - The protected admin area is <http://localhost:3001/admin>. Create posts at `/admin/post/new`; manage posts and your account from the admin navigation.
+- Authentication uses a 15-minute access token and a rotating seven-day refresh token. The frontend stores both in HttpOnly cookies and transparently refreshes sessions; the backend stores only a SHA-256 hash of each refresh token. Signing out, changing the password, or deleting an account revokes refresh sessions.
+- Administrators can save posts as drafts or publish them immediately, filter the admin list by status, edit posts, and preview Markdown before saving. Deleting a post, deleting the current account, and logging out require confirmation in a Toastify notification.
+- Sign-up and password changes require at least 8 characters, including an uppercase letter, a lowercase letter, a number, and a special character. Passwords are limited to 72 characters to match the password hashing limit.
 - Automatic sample-data seeding has been removed. Posts already stored in the PostgreSQL volume are preserved and are not deleted by this change.
 - The sign-in page links to `/forgot-password`, but email-based recovery is not configured. Contact the site administrator if access must be recovered.
 - Cover images currently use a publicly reachable URL. File upload needs a durable storage service and is not enabled.

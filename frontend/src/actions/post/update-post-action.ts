@@ -1,6 +1,6 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import {
   AdminPostSchema,
   readPostFormFields,
@@ -20,6 +20,7 @@ export async function updatePostAction(
     return {
       fields,
       errors: parsed.error.issues.map((issue) => issue.message),
+      success: false,
     };
   }
 
@@ -33,8 +34,10 @@ export async function updatePostAction(
   );
 
   if (!response.success) {
-    return { fields, errors: response.errors };
+    return { fields, errors: response.errors, success: false };
   }
 
-  redirect("/admin?updated=1");
+  revalidatePath("/admin");
+  revalidatePath("/");
+  return { fields: parsed.data, errors: [], success: true };
 }

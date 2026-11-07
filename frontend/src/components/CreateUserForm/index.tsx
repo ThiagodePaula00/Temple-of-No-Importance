@@ -4,6 +4,7 @@ import { createUserAction } from '@/actions/login/create-user-action';
 import { UserRoundIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useActionState } from 'react';
+import { useActionToast } from '@/hooks/use-action-toast';
 
 export default function CreateUserForm() {
   const [state, action, isPending] = useActionState(createUserAction, {
@@ -11,6 +12,7 @@ export default function CreateUserForm() {
     email: '',
     errors: [],
   });
+  useActionToast({ ...state, success: false }, '');
 
   return (
     <div className="mx-auto my-16 mb-32 max-w-sm rounded-xl border border-(--card-border) bg-(--card-background) p-8 text-center shadow-lg">
@@ -97,11 +99,10 @@ export default function CreateUserForm() {
           </label>
         </div>
 
-        {state.errors.length > 0 && (
-          <ul className="list-inside list-disc text-left text-sm text-red-500" role="alert">
-            {state.errors.map((error) => <li key={error}>{error}</li>)}
-          </ul>
-        )}
+        <p className="text-left text-xs text-(--muted-text-color)">
+          Use at least 8 characters, including uppercase and lowercase letters,
+          a number, and a special character.
+        </p>
 
         <button
           disabled={isPending}

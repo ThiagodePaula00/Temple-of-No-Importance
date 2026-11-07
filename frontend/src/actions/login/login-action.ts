@@ -30,6 +30,7 @@ export async function loginAction(
 
   const response = await apiRequest<{
     accessToken: string;
+    refreshToken: string;
     user: SessionUser;
   }>("/auth/sign-in", {
     method: "POST",
@@ -41,6 +42,9 @@ export async function loginAction(
     return { email, errors: response.errors };
   }
 
-  await createLoginSessionFromApi(response.data.accessToken);
+  await createLoginSessionFromApi(
+    response.data.accessToken,
+    response.data.refreshToken,
+  );
   redirect(response.data.user.isAdmin ? "/admin" : "/");
 }

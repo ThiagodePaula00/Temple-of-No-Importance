@@ -13,6 +13,7 @@ import {
 import { AuthGuard, type AuthenticatedRequest } from "./auth.guard.js";
 import {
   ChangePasswordDto,
+  RefreshTokenDto,
   SignInDto,
   SignUpDto,
   UpdateProfileDto,
@@ -37,6 +38,18 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   signIn(@Body() body: SignInDto) {
     return this.auth.signIn(body.email, body.password);
+  }
+
+  @Post("refresh")
+  @HttpCode(HttpStatus.OK)
+  refresh(@Body() body: RefreshTokenDto) {
+    return this.auth.refresh(body.refreshToken);
+  }
+
+  @Post("logout")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@Body() body: RefreshTokenDto) {
+    await this.auth.revokeRefreshToken(body.refreshToken);
   }
 
   @Get("me")

@@ -1,6 +1,6 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import {
   AdminPostSchema,
   readPostFormFields,
@@ -19,6 +19,7 @@ export async function createPostAction(
     return {
       fields,
       errors: parsed.error.issues.map((issue) => issue.message),
+      success: false,
     };
   }
 
@@ -29,8 +30,10 @@ export async function createPostAction(
   });
 
   if (!response.success) {
-    return { fields, errors: response.errors };
+    return { fields, errors: response.errors, success: false };
   }
 
-  redirect("/admin?created=1");
+  revalidatePath("/admin");
+  if (parsed.data.published) revalidatePath("/");
+  return { fields: parsed.data, errors: [], success: true };
 }

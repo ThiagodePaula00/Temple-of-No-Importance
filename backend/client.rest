@@ -3,6 +3,7 @@
 @adminEmail = admin@example.com
 @adminPassword = Change-this-password-123
 @accessToken = {{signIn.response.body.accessToken}}
+@refreshToken = {{signIn.response.body.refreshToken}}
 @postId = {{createPost.response.body.id}}
 @postSlug = {{createPost.response.body.slug}}
 
@@ -32,13 +33,22 @@ Content-Type: application/json
   "password": "{{adminPassword}}"
 }
 
+### Rotate access and refresh tokens (access token expires in 15 minutes)
+# @name refreshSession
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
 ### Get the current account
 GET {{baseUrl}}/auth/me
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{refreshSession.response.body.accessToken}}
 
 ### Update the current account profile
 PATCH {{baseUrl}}/auth/me
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{refreshSession.response.body.accessToken}}
 Content-Type: application/json
 
 {
@@ -48,12 +58,12 @@ Content-Type: application/json
 
 ### List all posts (admin only)
 GET {{baseUrl}}/posts/admin
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{refreshSession.response.body.accessToken}}
 
 ### Create a published post (admin only)
 # @name createPost
 POST {{baseUrl}}/posts
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{refreshSession.response.body.accessToken}}
 Content-Type: application/json
 
 {
@@ -69,7 +79,7 @@ GET {{baseUrl}}/posts/{{postSlug}}
 
 ### Update a post (admin only)
 PATCH {{baseUrl}}/posts/{{postId}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{refreshSession.response.body.accessToken}}
 Content-Type: application/json
 
 {
@@ -82,11 +92,11 @@ Content-Type: application/json
 
 ### Delete a post (admin only)
 DELETE {{baseUrl}}/posts/{{postId}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{refreshSession.response.body.accessToken}}
 
 ### Change the current account password
 PATCH {{baseUrl}}/auth/me/password
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{refreshSession.response.body.accessToken}}
 Content-Type: application/json
 
 {
@@ -96,4 +106,12 @@ Content-Type: application/json
 
 ### Delete the current account
 DELETE {{baseUrl}}/auth/me
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{refreshSession.response.body.accessToken}}
+
+### Revoke the current refresh token
+POST {{baseUrl}}/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshSession.response.body.refreshToken}}"
+}

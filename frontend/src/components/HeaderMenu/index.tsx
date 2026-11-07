@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { logoutAction } from "@/actions/login/logout-action";
+import { ConfirmLogoutButton } from "@/components/ConfirmLogoutButton";
 import { ToggleTheme } from "@/components/ToggleTheme";
 
 type HeaderMenuProps = {
@@ -77,12 +77,13 @@ export function HeaderMenu({ isAuthenticated, isAdmin }: HeaderMenuProps) {
           )}
           {isAuthenticated ? (
             <li>
-              <form action={logoutAction}>
-                <button className={itemClass} type="submit">
-                  <LogOutIcon aria-hidden="true" />
-                  <span>Log out</span>
-                </button>
-              </form>
+              <ConfirmLogoutButton
+                className={itemClass}
+                onConfirmed={closeMenu}
+              >
+                <LogOutIcon aria-hidden="true" />
+                <span>Log out</span>
+              </ConfirmLogoutButton>
             </li>
           ) : (
             <>

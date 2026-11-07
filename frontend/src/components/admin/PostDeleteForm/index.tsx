@@ -1,36 +1,58 @@
 "use client";
 
-import { useState } from "react";
-import { deletePostAction } from "@/actions/post/delete-post-action";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { toast } from "react-toastify";
+import { deletePostAction } from "@/actions/post/delete-post-action";
+import { confirmWithToast } from "@/utils/toast-confirm";
 
-export function PostDeleteForm({ id, title }: { id: string; title: string }) {
-  const [error, setError] = useState("");
+export function PostDeleteForm({
+  id,
+  title,
+}: {
+  id: string;
+  title: string;
+}) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  return (
-    <form
-      action={() => {
+  function requestDelete() {
+    confirmWithToast({
+      toastId: `confirm-delete-post-${id}`,
+      title: "Delete post?",
+      message: `“${title}” will be permanently deleted.`,
+      confirmLabel: "Delete post",
+      destructive: true,
+      onConfirm: () => {
         startTransition(async () => {
-          const result = await deletePostAction(id);
-          if (result?.error) setError(result.error);
+          try {
+            const result = await deletePostAction(id);
+
+            if (!result.success) {
+              toast.error(result.error);
+              return;
+            }
+
+            toast.success("Post deleted.");
+            router.refresh();
+          } catch (error) {
+            console.error("Failed to delete post.", error);
+            toast.error("Could not delete the post. Please try again.");
+          }
         });
-      }}
-      onSubmit={(event) => {
-        if (!window.confirm(`Delete “${title}”? This cannot be undone.`)) {
-          event.preventDefault();
-        }
-      }}
+      },
+    });
+  }
+
+  return (
+    <button
+      aria-label={`Delete post: ${title}`}
+      className="rounded px-2 py-1 text-sm text-red-500 transition-colors hover:bg-red-500/10 disabled:cursor-wait disabled:opacity-50"
+      disabled={isPending}
+      onClick={requestDelete}
+      type="button"
     >
-      <button
-        aria-label={`Delete post: ${title}`}
-        className="rounded px-2 py-1 text-sm text-red-500 transition-colors hover:bg-red-500/10 disabled:opacity-50"
-        disabled={isPending}
-        type="submit"
-      >
-        {isPending ? "Deleting…" : "Delete"}
-      </button>
-      {error && <p className="basis-full text-sm text-red-500" role="alert">{error}</p>}
-    </form>
+      {isPending ? "Deleting…" : "Delete"}
+    </button>
   );
 }

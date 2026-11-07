@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { updateUserAction } from "@/actions/user/update-user-action";
 import type { SessionUser } from "@/lib/login/manage-login";
+import { useActionToast } from "@/hooks/use-action-toast";
+import { DeleteAccountButton } from "@/components/admin/DeleteAccountButton";
 
 export function UpdateUserForm({ user }: { user: SessionUser }) {
   const [state, action, isPending] = useActionState(updateUserAction, {
@@ -11,6 +13,7 @@ export function UpdateUserForm({ user }: { user: SessionUser }) {
     errors: [],
     success: false,
   });
+  useActionToast(state, "Account updated.");
 
   return (
     <form action={action} className="mx-auto grid max-w-md gap-5">
@@ -31,12 +34,6 @@ export function UpdateUserForm({ user }: { user: SessionUser }) {
           />
         </label>
       ))}
-      {state.errors.length > 0 && (
-        <ul className="list-inside list-disc text-sm text-red-500" role="alert">
-          {state.errors.map((error) => <li key={error}>{error}</li>)}
-        </ul>
-      )}
-      {state.success && <p role="status">Account updated.</p>}
       <button
         className="justify-self-start rounded-md bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
         disabled={isPending}
@@ -47,6 +44,7 @@ export function UpdateUserForm({ user }: { user: SessionUser }) {
       <Link className="w-fit underline" href="/admin/user/password">
         Change password
       </Link>
+      <DeleteAccountButton />
     </form>
   );
 }

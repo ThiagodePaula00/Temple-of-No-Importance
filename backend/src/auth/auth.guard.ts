@@ -31,10 +31,14 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException("Authentication is required.");
     }
 
-    let payload: { sub: string };
+    let payload: { sub: string; tokenType?: string };
     try {
       payload = await this.jwt.verifyAsync<{ sub: string }>(token);
     } catch {
+      throw new UnauthorizedException("The session is invalid or has expired.");
+    }
+
+    if (payload.tokenType !== "access") {
       throw new UnauthorizedException("The session is invalid or has expired.");
     }
 
