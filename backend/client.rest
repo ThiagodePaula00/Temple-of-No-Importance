@@ -76,10 +76,6 @@ Content-Type: application/json
 GET {{baseUrl}}/posts/admin
 Authorization: Bearer {{accessToken}}
 
-### Get a post by ID, including drafts (administrator only)
-GET {{baseUrl}}/posts/admin/{{postId}}
-Authorization: Bearer {{accessToken}}
-
 ### Create a published post (administrator only)
 # @name createPost
 POST {{baseUrl}}/posts
@@ -89,10 +85,14 @@ Content-Type: application/json
 {
   "title": "A first Temple post",
   "excerpt": "A short introduction to this post.",
-  "content": "Write the post content in Markdown. Use ![Alt text](/api/uploads/IMAGE.webp) for an uploaded image.",
+  "content": "Write the post content in Markdown. Use ![Alt text](http://localhost:3000/uploads/IMAGE.webp) for an uploaded image.",
   "coverImageUrl": "https://example.com/cover.jpg",
   "published": true
 }
+
+### Get a post by ID, including drafts (administrator only)
+GET {{baseUrl}}/posts/admin/{{postId}}
+Authorization: Bearer {{accessToken}}
 
 ### Create a draft post (administrator only)
 POST {{baseUrl}}/posts
@@ -129,7 +129,7 @@ Authorization: Bearer {{accessToken}}
 
 ### Upload an image (administrator only; JPG, PNG, or WEBP, up to 5 MB)
 # Replace ./path/to/your-image.jpg with an image file on your machine.
-# The backend resizes it to at most 1920 px wide, converts it to WEBP, and returns its URL.
+# The backend resizes it to at most 1920 px wide, converts it to WEBP, and returns its URL in the response body.
 # @name uploadImage
 POST {{baseUrl}}/upload
 Authorization: Bearer {{accessToken}}

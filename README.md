@@ -4,8 +4,7 @@ Temple of No Importance is a personal blog about philosophy and related subjects
 
 ## Site screenshot
 
-Add a screenshot at `docs/site-screenshot.png` and uncomment the Markdown image below when one is available.
-<!-- ![Temple of No Importance homepage](docs/site-screenshot.png) -->
+![Captura de tela do site](docs/app.png)
 
 ## Features
 
