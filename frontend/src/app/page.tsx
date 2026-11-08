@@ -6,11 +6,8 @@ import { findAllPublicPostsFromApi } from "@/post/queries/public";
 import { connection } from "next/server";
 import { Suspense } from "react";
 
-const SPIN_LOADER_TEST_DELAY_MS = 3000; // Testing
-
 async function PublicPosts() {
   await connection();
-  await new Promise((resolve) => setTimeout(resolve, SPIN_LOADER_TEST_DELAY_MS)); //Testing
   const response = await findAllPublicPostsFromApi();
 
   if (!response.success) {

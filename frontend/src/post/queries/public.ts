@@ -6,6 +6,7 @@ import { cache } from 'react';
 export const findAllPublicPostsFromApi = cache(async () => {
   return apiRequest<PostModel[]>('/posts', {
     cache: 'no-store',
+    signal: AbortSignal.timeout(30_000),
   });
 });
 

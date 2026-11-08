@@ -53,12 +53,15 @@ export async function apiRequest<T>(
   } catch (err) {
     console.error(`Falha ao consultar a API (${url})`, err);
 
-    return {
-      errors: [
-        err instanceof Error
+    const errorMessage =
+      err instanceof Error && err.name === 'TimeoutError'
+        ? 'The API took too long to respond. Please try again.'
+        : err instanceof Error
           ? `Failed to connect to the API: ${err.message}`
-          : 'Failed to connect to the API',
-      ],
+          : 'Failed to connect to the API';
+
+    return {
+      errors: [errorMessage],
       success: false,
       status: 500,
     };
