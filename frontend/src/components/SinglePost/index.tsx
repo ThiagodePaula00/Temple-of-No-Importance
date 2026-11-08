@@ -3,6 +3,7 @@ import { PostModel } from '@/models/post/post-models';
 import { PostDate } from '../PostDate';
 import { SafeMarkdown } from '../SafeMarkdown';
 import { coverImageSrc } from '@/utils/cover-image-src';
+import { PostShare } from '@/components/PostShare';
 
 type SinglePostProps = {
   post: PostModel;
@@ -37,6 +38,7 @@ export function SinglePost({ post }: SinglePostProps) {
         </p>
 
         <SafeMarkdown markdown={post.content} />
+        <PostShare title={post.title} />
       </article>
     </main>
   );
