@@ -1,6 +1,7 @@
 import { PostCoverImage } from "@/components/PostCoverImage";
 import { PostSummary } from "@/components/PostSummary";
 import type { PostModel } from "@/models/post/post-models";
+import { coverImageSrc } from "@/utils/cover-image-src";
 
 export function PostCard({ post }: { post: PostModel }) {
   const postLink = `/post/${post.slug}`;
@@ -12,7 +13,7 @@ export function PostCard({ post }: { post: PostModel }) {
         imageProps={{
           width: 1200,
           height: 720,
-          src: post.coverImageUrl,
+          src: coverImageSrc(post.coverImageUrl),
           alt: post.title,
         }}
       />

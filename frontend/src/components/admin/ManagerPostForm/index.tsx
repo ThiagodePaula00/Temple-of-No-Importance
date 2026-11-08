@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPostAction } from "@/actions/post/create-post-action";
 import { updatePostAction } from "@/actions/post/update-post-action";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { MarkdownImageUploader } from "@/components/admin/MarkdownImageUploader";
 import { SafeMarkdown } from "@/components/SafeMarkdown";
 import type { PostModel } from "@/models/post/post-models";
 import type { AdminPostInput, PostActionState } from "@/lib/post/schemas";
@@ -51,6 +52,8 @@ export function ManagerPostForm(props: ManagerPostFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
   const [fields, setFields] = useState(initialFields);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const contentRef = useRef(fields.content);
 
   useActionToast(
     state,
@@ -69,6 +72,27 @@ export function ManagerPostForm(props: ManagerPostFormProps) {
     value: AdminPostInput[Key],
   ) {
     setFields((current) => ({ ...current, [key]: value }));
+  }
+
+  function insertContentImage(url: string, altText: string) {
+    const textarea = contentTextareaRef.current;
+    const content = contentRef.current;
+    const start = textarea?.selectionStart ?? content.length;
+    const end = textarea?.selectionEnd ?? start;
+    const imageMarkdown = `![${altText.replace(/[\[\]]/g, "")}](${url})`;
+    const before = content.slice(0, start);
+    const after = content.slice(end);
+    const prefix = before && !before.endsWith("\n") ? "\n\n" : "";
+    const suffix = after && !after.startsWith("\n") ? "\n\n" : "";
+    const updatedContent = `${before}${prefix}${imageMarkdown}${suffix}${after}`;
+    const cursorPosition = before.length + prefix.length + imageMarkdown.length;
+
+    contentRef.current = updatedContent;
+    updateField("content", updatedContent);
+    requestAnimationFrame(() => {
+      textarea?.focus();
+      textarea?.setSelectionRange(cursorPosition, cursorPosition);
+    });
   }
 
   return (
@@ -111,11 +135,19 @@ export function ManagerPostForm(props: ManagerPostFormProps) {
           disabled={isPending}
           id="content"
           name="content"
-          onChange={(event) => updateField("content", event.target.value)}
+          onChange={(event) => {
+            contentRef.current = event.target.value;
+            updateField("content", event.target.value);
+          }}
+          ref={contentTextareaRef}
           required
           value={fields.content}
         />
       </label>
+      <MarkdownImageUploader
+        disabled={isPending}
+        onImageUploaded={insertContentImage}
+      />
       <button
         aria-expanded={isPreviewOpen}
         className="w-fit rounded-md border border-(--control-border) px-3 py-1.5 text-sm transition-colors hover:bg-(--menu-background)"
@@ -142,7 +174,9 @@ export function ManagerPostForm(props: ManagerPostFormProps) {
       <ImageUploader
         defaultValue={fields.coverImageUrl}
         disabled={isPending}
+        onValueChange={(url) => updateField("coverImageUrl", url)}
       />
+      <input name="coverImageUrl" type="hidden" value={fields.coverImageUrl} />
 
       <label className="grid gap-2 text-sm font-semibold" htmlFor="published">
         Post status

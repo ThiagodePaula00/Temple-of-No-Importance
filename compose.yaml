@@ -30,6 +30,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads
 
   frontend:
     build:
@@ -52,3 +54,4 @@ volumes:
   frontend_node_modules:
   frontend_next:
   postgres_data:
+  uploads_data:

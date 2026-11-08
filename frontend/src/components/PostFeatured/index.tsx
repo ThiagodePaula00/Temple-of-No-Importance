@@ -2,6 +2,7 @@ import { PostModel } from "@/models/post/post-models";
 import ErrorMessage from "../ErrorMessage";
 import { PostCoverImage } from "../PostCoverImage";
 import { PostSummary } from "../PostSummary";
+import { coverImageSrc } from "@/utils/cover-image-src";
 
 type PostFeaturedprops = {
     post?: PostModel;
@@ -25,7 +26,7 @@ export function PostFeatured({ post }: PostFeaturedprops) {
                 imageProps={{
                     width: 1200,
                     height: 700,
-                    src: post.coverImageUrl,
+                    src: coverImageSrc(post.coverImageUrl),
                     alt: post.title,
                     priority: true,
                 }}

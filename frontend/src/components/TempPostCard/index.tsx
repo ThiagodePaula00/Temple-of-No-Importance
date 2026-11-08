@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { coverImageSrc } from "@/utils/cover-image-src";
 import type { Post } from "@/lib/posts";
 import { PostDate } from "@/components/PostDate";
 
@@ -11,7 +12,7 @@ export function TempPostCard({ post }: TempoPostCardProps) {
     <article className="flex flex-col overflow-hidden rounded-xl">
       <div className="relative aspect-5/3 w-full bg-(--card-background)">
         <Image
-          src={post.coverImageUrl}
+          src={coverImageSrc(post.coverImageUrl)}
           alt={`Capa do post: ${post.title}`}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

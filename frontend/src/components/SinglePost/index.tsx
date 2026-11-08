@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { PostModel } from '@/models/post/post-models';
 import { PostDate } from '../PostDate';
 import { SafeMarkdown } from '../SafeMarkdown';
+import { coverImageSrc } from '@/utils/cover-image-src';
 
 type SinglePostProps = {
   post: PostModel;
@@ -14,7 +15,7 @@ export function SinglePost({ post }: SinglePostProps) {
         <header className="flex flex-col gap-4">
           <Image
             className="max-h-128 w-full rounded-xl object-cover"
-            src={post.coverImageUrl}
+            src={coverImageSrc(post.coverImageUrl)}
             width={1200}
             height={720}
             alt={post.title}

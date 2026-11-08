@@ -4,7 +4,11 @@ export const AdminPostSchema = z.object({
   title: z.string().trim().min(2, "Title must contain at least 2 characters."),
   excerpt: z.string().trim().max(500, "Excerpt must be at most 500 characters."),
   content: z.string().min(1, "Post content is required."),
-  coverImageUrl: z.union([z.literal(""), z.string().url("Enter a valid image URL.")]),
+  coverImageUrl: z.union([
+    z.literal(""),
+    z.string().url("Enter a valid image URL."),
+    z.string().regex(/^\/api\/uploads\/[\w.-]+\.webp$/, "Enter a valid image URL."),
+  ]),
   published: z.boolean(),
 });
 
