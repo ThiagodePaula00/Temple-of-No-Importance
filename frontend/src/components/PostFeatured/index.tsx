@@ -11,7 +11,7 @@ export function PostFeatured({ post }: PostFeaturedprops) {
     if (!post) {
         return (
             <ErrorMessage
-                contentTitle='Ops 😅'
+                contentTitle='Ops :/'
                 content='No post created yet.'
             />
         );
@@ -20,7 +20,7 @@ export function PostFeatured({ post }: PostFeaturedprops) {
     const postLink = `/post/${post.slug}`;
 
     return (
-        <section className='group grid w-full grid-cols-1 gap-0 overflow-hidden rounded-xl sm:grid-cols-2 shadow-lg'>
+        <section className='group grid w-full grid-cols-1 gap-0 overflow-hidden rounded-xl mb-4 sm:grid-cols-2 shadow-lg'>
             <PostCoverImage
                 linkProps={{ href: postLink }}
                 imageProps={{

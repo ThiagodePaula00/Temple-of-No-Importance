@@ -7,7 +7,7 @@ export function PostCard({ post }: { post: PostModel }) {
   const postLink = `/post/${post.slug}`;
 
   return (
-    <article className="group flex flex-col gap-0 overflow-hidden rounded-xl shadow-lg">
+    <article className="group flex flex-col gap-0 overflow-hidden rounded-xl border border-(--card-border) shadow-lg">
       <PostCoverImage
         linkProps={{ href: postLink }}
         imageProps={{
@@ -17,7 +17,7 @@ export function PostCard({ post }: { post: PostModel }) {
           alt: post.title,
         }}
       />
-      <div className="border-r border-b border-l border-(--card-border) bg-(--card-background) p-4 text-(--text-color) transition-colors duration-200">
+      <div className="bg-(--card-background) p-4 text-(--text-color) transition-colors duration-200">
         <PostSummary
           postLink={postLink}
           postHeading="h2"
