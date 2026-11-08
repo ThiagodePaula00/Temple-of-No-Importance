@@ -12,11 +12,33 @@ import { AuthModule } from './auth/auth.module.js';
 import { UploadModule } from './upload/upload.module.js';
 import { User } from './users/user.entity.js';
 import { RefreshToken } from './auth/refresh-token.entity.js';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { SecurityThrottlerGuard } from './security-throttler.guard.js';
+import { positiveInteger } from './security-config.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
+const isProduction = process.env.NODE_ENV === "production";
+const synchronizeSchema =
+  process.env.TYPEORM_SYNCHRONIZE === "true" ||
+  (!isProduction && process.env.TYPEORM_SYNCHRONIZE !== "false");
+
+if (
+  isProduction &&
+  (!process.env.POSTGRES_PASSWORD ||
+    process.env.POSTGRES_PASSWORD.length < 24 ||
+    /placeholder|replace|set-this|defina|example/i.test(process.env.POSTGRES_PASSWORD))
+) {
+  throw new Error("A non-placeholder POSTGRES_PASSWORD is required in production.");
+}
+
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      ttl: positiveInteger(process.env.RATE_LIMIT_TTL_MS, 60_000, "RATE_LIMIT_TTL_MS"),
+      limit: positiveInteger(process.env.RATE_LIMIT_MAX, 120, "RATE_LIMIT_MAX"),
+    }]),
     TypeOrmModule.forRoot({
       type: "postgres",
       host: process.env.DB_HOST ?? "localhost",
@@ -25,7 +47,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB?? "posts",
       entities: [Post, User, RefreshToken],
-      synchronize: process.env.TYPEORM_SYNCHRONIZE !== "false",
+      synchronize: synchronizeSchema,
       retryAttempts: 10,
       retryDelay: 3000,
     }),
@@ -38,6 +60,6 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     UploadModule,
   ],
   controllers: [AppController, HealthController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: SecurityThrottlerGuard }],
 })
 export class AppModule {}

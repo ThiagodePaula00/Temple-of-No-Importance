@@ -5,9 +5,19 @@ import { Footer } from "@/components/Footer";
 import { Container } from "@/components/Container";
 import { ToastifyContainer } from "@/components/ToastifyContainer";
 import { ToggleThemeProvider } from "@/components/ToggleTheme";
+import localFont from "next/font/local";
 import { getCurrentUser } from "@/lib/login/manage-login";
 import "katex/dist/katex.min.css";
 import "react-toastify/dist/ReactToastify.css";
+
+const oldeEnglishFont = localFont({
+  src: "./fonts/OldeEnglish-Regular.ttf",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+  variable: "--font-olde-english",
+  preload: false,
+});
 
 export const metadata: Metadata = {
   title: {
@@ -25,7 +35,7 @@ export default async function RootLayout({ children }: Readonly<RootLayoutProps>
   const user = await getCurrentUser();
   return (
     <html lang="en">
-      <body>
+      <body className={oldeEnglishFont.variable}>
         <ToggleThemeProvider>
           <Container>
             <Header isAuthenticated={Boolean(user)} isAdmin={user?.isAdmin ?? false} />

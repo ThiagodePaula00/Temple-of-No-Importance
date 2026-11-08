@@ -26,3 +26,20 @@
   --menu-background: #e5e5e5;
   --menu-border: #b8b8b8;
 }
+.header-title-font {
+  font-family: "Olde English", "Old English Text MT", var(--font-olde-english), serif;
+}
+
+@keyframes svgRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes svgDash {
+  0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35; }
+  100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124; }
+}
+
+.animate-svg-rotate { animation: svgRotate 1.4s linear infinite; }
+.animate-svg-dash { animation: svgDash 1.4s ease-in-out infinite; }

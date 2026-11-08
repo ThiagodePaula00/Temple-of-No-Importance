@@ -13,6 +13,7 @@ import {
 import { AdminGuard, AuthGuard, type AuthenticatedRequest } from "../auth/auth.guard.js";
 import { CreatePostDto, UpdatePostDto } from "./post.dto.js";
 import { PostsService } from "./post.service.js";
+import { Throttle } from "@nestjs/throttler";
 
 @Controller("posts")
 export class PostController {
@@ -52,6 +53,7 @@ export class PostController {
   }
 
   @Get()
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
   findPublished(@Query("q") q?: string) {
     return this.postsService.findPublished(q);
   }

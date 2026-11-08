@@ -5,6 +5,7 @@ import {
   KeyRoundIcon,
   LogOutIcon,
   PlusIcon,
+  ShieldCheckIcon,
   ShieldUserIcon,
   UserPlusIcon,
 } from "lucide-react";
@@ -28,13 +29,13 @@ export function Header({ isAuthenticated, isAdmin }: HeaderProps) {
 
 return (
     <header
-      className={`relative z-50 mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 px-4 pt-3 pb-8 font-bold sm:px-6 lg:grid-cols-[max-content_minmax(0,1fr)_max-content] lg:gap-x-4 lg:px-6 ${
+      className={`relative z-50 mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-2 px-4 pt-3 pb-8 font-bold sm:px-6 lg:grid-cols-[max-content_minmax(0,1fr)_max-content] lg:gap-x-4 lg:px-6 ${
         isSearchOpen ? "grid-rows-[auto_auto]" : ""
       }`}
     >
-      <h1 className="col-start-1 row-start-1 text-xl/normal transition-[font-size,line-height] duration-250 motion-reduce:transition-none sm:text-4xl/normal">
+      <h1 className="col-start-1 row-start-1 min-w-0 text-4xl transition-[font-size,line-height] duration-250 motion-reduce:transition-none">
         <Link
-          className="cursor-pointer whitespace-nowrap transition-colors hover:text-(--muted-text-color)"
+          className="header-title-font block cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap font-normal transition-colors hover:text-red-600"
           href="/"
           title="Home"
         >
@@ -47,14 +48,14 @@ return (
         onOpenChange={setIsSearchOpen}
         slotClassName={`${
           isSearchOpen
-            ? "static col-span-2 row-start-2 w-full pt-2"
-            : "absolute top-3 right-[3.25rem] w-auto sm:top-[calc(50%_-_0.625rem)] sm:-translate-y-1/2 lg:top-3 lg:translate-y-0"
-        } lg:static lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:w-full lg:translate-y-0 lg:pt-0`}
+            ? "col-span-3 row-start-2 w-full pt-2"
+            : "col-start-2 row-start-1 w-8 self-center"
+        } lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:w-full lg:pt-0`}
       />
 
       <nav
         aria-label="Main navigation"
-        className="col-start-2 row-start-1 flex items-center lg:col-start-3"
+        className="col-start-3 row-start-1 flex items-center lg:col-start-3"
       >
         <div className="hidden items-center gap-4 lg:flex">
           <ToggleTheme className={`${iconLinkClass} cursor-pointer whitespace-nowrap`} />
@@ -62,6 +63,10 @@ return (
           <Link className={iconLinkClass} href="/about" title="About us">
             <BookTextIcon aria-hidden="true" />
             <span>About us</span>
+          </Link>
+          <Link className={iconLinkClass} href="/privacy" title="Privacy policy">
+            <ShieldCheckIcon aria-hidden="true" />
+            <span>Privacy</span>
           </Link>
 
           {isAdmin && (

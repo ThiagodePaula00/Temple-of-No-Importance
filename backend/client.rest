@@ -2,8 +2,8 @@
 @adminName = Temple Admin
 @adminEmail = admin@example.com
 @adminPassword = Change-this-password-123
-@accessToken = {{signIn.response.body.accessToken}}
-@refreshToken = {{signIn.response.body.refreshToken}}
+@accessToken = {{refreshSession.response.body.accessToken}}
+@refreshToken = {{refreshSession.response.body.refreshToken}}
 @postId = {{createPost.response.body.id}}
 @postSlug = {{createPost.response.body.slug}}
 
@@ -13,7 +13,10 @@ GET {{baseUrl}}/health
 ### List published posts
 GET {{baseUrl}}/posts
 
-### Create the first account (the first registered account becomes admin)
+### Search published posts (searches post content)
+GET {{baseUrl}}/posts?q=integrals
+
+### Create the first account (the first account becomes an administrator)
 POST {{baseUrl}}/auth/sign-up
 Content-Type: application/json
 
@@ -33,22 +36,24 @@ Content-Type: application/json
   "password": "{{adminPassword}}"
 }
 
-### Rotate access and refresh tokens (access token expires in 15 minutes)
+# Rotate the access and refresh tokens
+# Run this after signing in, then use the returned tokens for the requests below.
+# Access tokens expire after 15 minutes; refresh tokens expire after 7 days and rotate on use.
 # @name refreshSession
 POST {{baseUrl}}/auth/refresh
 Content-Type: application/json
 
 {
-  "refreshToken": "{{refreshToken}}"
+  "refreshToken": "{{signIn.response.body.refreshToken}}"
 }
 
 ### Get the current account
 GET {{baseUrl}}/auth/me
-Authorization: Bearer {{refreshSession.response.body.accessToken}}
+Authorization: Bearer {{accessToken}}
 
 ### Update the current account profile
 PATCH {{baseUrl}}/auth/me
-Authorization: Bearer {{refreshSession.response.body.accessToken}}
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -56,30 +61,58 @@ Content-Type: application/json
   "email": "{{adminEmail}}"
 }
 
-### List all posts (admin only)
-GET {{baseUrl}}/posts/admin
-Authorization: Bearer {{refreshSession.response.body.accessToken}}
+### Change the current account password
+# This revokes all active refresh sessions for the account.
+PATCH {{baseUrl}}/auth/me/password
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
 
-### Create a published post (admin only)
+{
+  "currentPassword": "{{adminPassword}}",
+  "newPassword": "Change-this-password-456"
+}
+
+### List all posts, including drafts (administrator only)
+GET {{baseUrl}}/posts/admin
+Authorization: Bearer {{accessToken}}
+
+### Get a post by ID, including drafts (administrator only)
+GET {{baseUrl}}/posts/admin/{{postId}}
+Authorization: Bearer {{accessToken}}
+
+### Create a published post (administrator only)
 # @name createPost
 POST {{baseUrl}}/posts
-Authorization: Bearer {{refreshSession.response.body.accessToken}}
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
   "title": "A first Temple post",
   "excerpt": "A short introduction to this post.",
-  "content": "Write the post content in Markdown.",
+  "content": "Write the post content in Markdown. Use ![Alt text](/api/uploads/IMAGE.webp) for an uploaded image.",
   "coverImageUrl": "https://example.com/cover.jpg",
   "published": true
 }
 
-### Get a published post
+### Create a draft post (administrator only)
+POST {{baseUrl}}/posts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "A draft post",
+  "excerpt": "A draft that is not publicly visible.",
+  "content": "Draft content in Markdown.",
+  "coverImageUrl": "",
+  "published": false
+}
+
+### Get a published post by slug
 GET {{baseUrl}}/posts/{{postSlug}}
 
-### Update a post (admin only)
+### Update a post (administrator only)
 PATCH {{baseUrl}}/posts/{{postId}}
-Authorization: Bearer {{refreshSession.response.body.accessToken}}
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -90,41 +123,38 @@ Content-Type: application/json
   "published": true
 }
 
-### Delete a post (admin only)
+### Delete a post (administrator only)
 DELETE {{baseUrl}}/posts/{{postId}}
-Authorization: Bearer {{refreshSession.response.body.accessToken}}
+Authorization: Bearer {{accessToken}}
 
-### Change the current account password
-PATCH {{baseUrl}}/auth/me/password
-Authorization: Bearer {{refreshSession.response.body.accessToken}}
-Content-Type: application/json
+### Upload an image (administrator only; JPG, PNG, or WEBP, up to 5 MB)
+# Replace ./path/to/your-image.jpg with an image file on your machine.
+# The backend resizes it to at most 1920 px wide, converts it to WEBP, and returns its URL.
+# @name uploadImage
+POST {{baseUrl}}/upload
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=-----TempleImageBoundary
 
-{
-  "currentPassword": "{{adminPassword}}",
-  "newPassword": "Change-this-password-456"
-}
+-------TempleImageBoundary
+Content-Disposition: form-data; name="file"; filename="your-image.jpg"
+Content-Type: image/jpeg
 
-### Delete the current account
-DELETE {{baseUrl}}/auth/me
-Authorization: Bearer {{refreshSession.response.body.accessToken}}
+< ./path/to/your-image.jpg
+-------TempleImageBoundary--
 
-### Revoke the current refresh token
+### Serve an uploaded image
+# Replace IMAGE.webp with the filename from the upload response.
+GET {{baseUrl}}/uploads/IMAGE.webp
+
+### Revoke a refresh token (sign out)
 POST {{baseUrl}}/auth/logout
 Content-Type: application/json
 
 {
-  "refreshToken": "{{refreshSession.response.body.refreshToken}}"
+  "refreshToken": "{{refreshToken}}"
 }
 
-### Upload an image (admin only)
-# @name uploadImage
-POST {{baseUrl}}/upload
-Authorization: Bearer {{refreshSession.response.body.accessToken}}
-Content-Type: multipart/form-data; boundary=-----BoundaryDelimitadorHttp
-
--------BoundaryDelimitadorHttp
-Content-Disposition: form-data; name="file"; filename="cover.jpg"
-Content-Type: image/jpeg
-
-< ./dev/images/cover.jpg
--------BoundaryDelimitadorHttp--
+### Delete the current account
+# Destructive: deletes the account and its refresh-token records. Existing posts and uploaded images are not removed automatically.
+DELETE {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}

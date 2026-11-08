@@ -1,0 +1,25 @@
+.social-item { position: relative; }
+.social-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px) rotate(15deg);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  background-color: var(--social-accent, #000);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-bottom: 8px;
+}
+.social-item:hover .social-tooltip {
+  transform: translateX(-50%) translateY(0) rotate(0);
+  opacity: 1;
+}
+.social-item--github { --social-accent: #24292e; }
+.social-item--instagram { --social-accent: #ee2a7b; }
+.social-item--youtube { --social-accent: #f00; }

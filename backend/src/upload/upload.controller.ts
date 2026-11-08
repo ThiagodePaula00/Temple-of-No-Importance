@@ -10,12 +10,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { AdminGuard, AuthGuard } from '../auth/auth.guard.js';
 import { UploadService } from './upload.service.js';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
   @Post()
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @UseGuards(AuthGuard, AdminGuard)
   @UseInterceptors(
     FileInterceptor('file', {

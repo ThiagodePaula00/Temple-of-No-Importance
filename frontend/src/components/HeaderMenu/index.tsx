@@ -6,6 +6,7 @@ import {
   LogOutIcon,
   MenuIcon,
   PlusIcon,
+  ShieldCheckIcon,
   ShieldUserIcon,
   UserPlusIcon,
   XIcon,
@@ -53,6 +54,12 @@ export function HeaderMenu({ isAuthenticated, isAdmin }: HeaderMenuProps) {
             <Link className={itemClass} href="/about" onClick={closeMenu}>
               <BookTextIcon aria-hidden="true" />
               <span>About us</span>
+            </Link>
+          </li>
+          <li>
+            <Link className={itemClass} href="/privacy" onClick={closeMenu}>
+              <ShieldCheckIcon aria-hidden="true" />
+              <span>Privacy policy</span>
             </Link>
           </li>
           {isAdmin && (

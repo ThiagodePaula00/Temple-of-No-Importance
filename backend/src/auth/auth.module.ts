@@ -8,9 +8,18 @@ import { RefreshToken } from "./refresh-token.entity.js";
 import { AuthService } from "./auth.service.js";
 
 const jwtSecret = process.env.JWT_SECRET_KEY;
+const exampleJwtSecret =
+  "generate-a-random-secret-key-with-at-least-32-characters";
 
-if (!jwtSecret || jwtSecret.length < 32) {
-  throw new Error("JWT_SECRET_KEY must contain at least 32 characters.");
+if (
+  !jwtSecret ||
+  jwtSecret.length < 32 ||
+  jwtSecret === exampleJwtSecret ||
+  /placeholder|replace|set-a-random|change-me|example/i.test(jwtSecret)
+) {
+  throw new Error(
+    "JWT_SECRET_KEY must contain at least 32 characters and must not use the example placeholder.",
+  );
 }
 
 @Module({

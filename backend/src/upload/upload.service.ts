@@ -22,7 +22,7 @@ export class UploadService {
         .resize(1920, null, { withoutEnlargement: true })
         .webp({ quality: 80 })
         .toFile(outputPath);
-    } catch (error) {
+    } catch {
       throw new BadRequestException('Falha ao processar o arquivo de imagem.');
     }
 
