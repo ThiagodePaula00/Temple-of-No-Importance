@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from "@nestjs/common";
@@ -51,8 +52,8 @@ export class PostController {
   }
 
   @Get()
-  findPublished() {
-    return this.postsService.findPublished();
+  findPublished(@Query("q") q?: string) {
+    return this.postsService.findPublished(q);
   }
 
   @Get(":slug")

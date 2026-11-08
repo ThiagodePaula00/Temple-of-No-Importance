@@ -16,13 +16,21 @@ export class PostsService {
     private readonly postsRepository: Repository<Post>,
   ) {}
 
-  findPublished() {
-    return this.postsRepository.find({
-      where: { published: true },
-      order: { createdAt: "DESC" },
-    });
-  }
+async findPublished(search?: string) {
+    const query = this.postsRepository.createQueryBuilder("post");
 
+    query.where("post.published = :published", { published: true });
+    query.orderBy("post.createdAt", "DESC");
+
+    if (search && search.trim() !== "") {
+      query.andWhere("LOWER(post.content) LIKE LOWER(:search)", {
+        search: `%${search.trim()}%`,
+      });
+    }
+
+    return query.getMany();
+  }
+  
   findAllForAdmin() {
     return this.postsRepository.find({ order: { createdAt: "DESC" } });
   }

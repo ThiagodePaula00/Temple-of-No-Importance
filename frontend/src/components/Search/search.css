@@ -3,17 +3,24 @@
     width 320ms ease,
     background-color 200ms ease,
     border-color 200ms ease;
-  }
-  
-  .header-search__button {
-    transition:
+  position: relative;
+  z-index: 50;
+}
+
+.header-search.is-open {
+  overflow: visible !important;
+  z-index: 60;
+}
+
+.header-search__button {
+  transition:
     right 320ms ease,
     left 320ms ease;
-  }
-  
-  .header-search__input {
-    transition: opacity 160ms ease;
-    background-color: var(--card-background)
+}
+
+.header-search__input {
+  transition: opacity 160ms ease;
+  background-color: var(--card-background);
 }
 
 .header-search.is-open .header-search__input {

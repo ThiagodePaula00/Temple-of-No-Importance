@@ -26,9 +26,9 @@ const iconLinkClass =
 export function Header({ isAuthenticated, isAdmin }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  return (
+return (
     <header
-      className={`relative mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 px-4 pt-3 pb-8 font-bold sm:px-6 lg:grid-cols-[max-content_minmax(0,1fr)_max-content] lg:gap-x-4 lg:px-6 ${
+      className={`relative z-50 mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 px-4 pt-3 pb-8 font-bold sm:px-6 lg:grid-cols-[max-content_minmax(0,1fr)_max-content] lg:gap-x-4 lg:px-6 ${
         isSearchOpen ? "grid-rows-[auto_auto]" : ""
       }`}
     >

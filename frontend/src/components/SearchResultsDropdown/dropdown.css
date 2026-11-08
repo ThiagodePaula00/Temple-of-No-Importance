@@ -1,0 +1,28 @@
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background-color: var(--card-background);
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+  z-index: 9999 !important;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+}
+
+.search-result-item {
+  border-bottom: 1px solid var(--card-border);
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item:hover {
+  background-color: var(--control-background);
+  color: var(--text-color);
+}
+
+.search-result-item p {
+  color: var(--muted-text-color);
+}

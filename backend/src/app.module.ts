@@ -3,10 +3,13 @@ import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { Post } from './posts/post.entity.js';
 import { HealthController } from './health/health.controller.js';
 import { PostModule } from './posts/posts.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { UploadModule } from './upload/upload.module.js';
 import { User } from './users/user.entity.js';
 import { RefreshToken } from './auth/refresh-token.entity.js';
 
@@ -26,8 +29,13 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       retryAttempts: 10,
       retryDelay: 3000,
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+    }),
     PostModule,
     AuthModule,
+    UploadModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

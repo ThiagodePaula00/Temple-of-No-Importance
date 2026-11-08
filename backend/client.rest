@@ -115,3 +115,16 @@ Content-Type: application/json
 {
   "refreshToken": "{{refreshSession.response.body.refreshToken}}"
 }
+
+### Upload an image (admin only)
+# @name uploadImage
+POST {{baseUrl}}/upload
+Authorization: Bearer {{refreshSession.response.body.accessToken}}
+Content-Type: multipart/form-data; boundary=-----BoundaryDelimitadorHttp
+
+-------BoundaryDelimitadorHttp
+Content-Disposition: form-data; name="file"; filename="cover.jpg"
+Content-Type: image/jpeg
+
+< ./dev/images/cover.jpg
+-------BoundaryDelimitadorHttp--

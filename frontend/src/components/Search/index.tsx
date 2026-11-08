@@ -1,8 +1,16 @@
 "use client";
 
 import { SearchIcon } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { SearchResultsDropdown } from "../SearchResultsDropdown";
 import "./search.css";
+
+type Post = {
+  id: string;
+  title: string;
+  excerpt: string;
+  slug: string;
+};
 
 type HeaderSearchProps = {
   isOpen: boolean;
@@ -16,19 +24,61 @@ export function HeaderSearch({
   slotClassName,
 }: HeaderSearchProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<Post[]>([]);
 
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus();
+    } else {
+      setQuery("");
+      setResults([]);
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch(`http://localhost:3000/posts?q=${encodeURIComponent(query)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setResults(data);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar posts:", error);
+      }
+    };
+
+    const timer = setTimeout(fetchPosts, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        if (!query.trim()) {
+          onOpenChange(false);
+        }
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [query, onOpenChange]);
+
   return (
-    <div className={slotClassName}>
+    <div className={slotClassName} ref={containerRef}>
       <div
-        className={`header-search relative flex h-8 w-8 flex-col items-center justify-center overflow-visible rounded-full border border-transparent bg-transparent lg:ml-auto lg:h-13 lg:w-11 lg:flex-row lg:justify-start lg:overflow-hidden ${
+        className={`header-search relative flex h-8 w-8 flex-col items-center justify-center overflow-visible rounded-full border border-transparent bg-transparent lg:ml-auto lg:h-13 lg:w-11 lg:flex-row lg:justify-start lg:overflow-visible ${
           isOpen
-            ? "is-open h-13 w-full overflow-hidden rounded-full border-(--control-border) bg-var(--control-background) lg:w-full"
+            ? "is-open h-13 w-full rounded-full border-(--control-border) bg-var(--control-background) lg:w-full"
             : ""
         }`}
       >
@@ -37,25 +87,31 @@ export function HeaderSearch({
           className={`header-search__input absolute inset-0 ${
             isOpen ? "static block" : "hidden"
           } h-full w-full rounded-full border-0 bg-transparent py-3 pr-4 pl-13 text-base font-normal text-inherit placeholder:text-(--muted-text-color) outline-none lg:static lg:block lg:opacity-0 lg:pointer-events-none`}
-          onBlur={(event) => {
-            if (!event.currentTarget.value.trim()) {
-              onOpenChange(false);
-            }
-          }}
           placeholder="Search"
           ref={inputRef}
           tabIndex={isOpen ? 0 : -1}
           type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
         <button
           title="Search"
           aria-label="Focus search"
-          className="header-search__button absolute top-1/2 right-auto left-1 grid size-8 min-h-8 min-w-8 -translate-y-1/2 cursor-pointer place-items-center rounded-full border-0 bg-transparent p-0 text-inherit transition-colors hover:text-[var(--muted-text-color)] lg:right-0.5 lg:left-auto lg:size-10 lg:min-h-10 lg:min-w-10"
+          className="header-search__button absolute top-1/2 right-auto left-1 grid size-8 min-h-8 min-w-8 -translate-y-1/2 cursor-pointer place-items-center rounded-full border-0 bg-transparent p-0 text-inherit transition-colors hover:text-(--muted-text-color) lg:right-0.5 lg:left-auto lg:size-10 lg:min-h-10 lg:min-w-10"
           onClick={() => onOpenChange(true)}
           type="button"
         >
           <SearchIcon aria-hidden="true" />
         </button>
+
+        <SearchResultsDropdown
+          results={results}
+          onSelect={() => {
+            onOpenChange(false);
+            setQuery("");
+            setResults([]);
+          }}
+        />
       </div>
     </div>
   );
