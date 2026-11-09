@@ -2,9 +2,10 @@
 
 Temple of No Importance is a personal blog about philosophy and related subjects, including mathematics, psychology, and science. Visitors can read and search published posts. Administrators can write Markdown posts, upload images, manage drafts, and administer their account.
 
-## Site screenshot
+## Site screenshots
 
 ![Captura de tela do site](docs/app.png)
+![Captura de tela do site](docs/app2.png)
 
 ## Features
 
