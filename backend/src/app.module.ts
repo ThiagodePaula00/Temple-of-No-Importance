@@ -50,7 +50,7 @@ if (
       port: Number(process.env.DB_PORT ?? 5432),
       username: process.env.POSTGRES_USER ?? "posts",
       password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB?? "posts",
+      database: process.env.POSTGRES_DB ?? "templeBlog",
       entities: [
         Post,
         User,

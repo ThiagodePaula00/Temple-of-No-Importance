@@ -99,9 +99,9 @@ For a new or existing production database, start PostgreSQL first and apply the 
 
 ```sh
 docker compose --env-file .env.production -f compose.production.yaml up -d postgres
-docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d posts < backend/migrations/001-comments-and-account-bans.sql
-docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d posts < backend/migrations/002-cascade-delete-comment-replies.sql
-docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d posts < backend/migrations/003-password-change-requests.sql
+docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d 'templeBlog' < backend/migrations/001-comments-and-account-bans.sql
+docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d 'templeBlog' < backend/migrations/002-cascade-delete-comment-replies.sql
+docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d 'templeBlog' < backend/migrations/003-password-change-requests.sql
 docker compose --env-file .env.production -f compose.production.yaml up --build -d
 ```
 
