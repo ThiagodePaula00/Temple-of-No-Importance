@@ -17,6 +17,9 @@ export class User {
   @Column({ type: "boolean", default: false })
   isAdmin: boolean;
 
+  @Column({ type: "boolean", name: "is_banned", default: false })
+  isBanned: boolean;
+
   @Column({ type: "timestamp", name: "created_at", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
 }

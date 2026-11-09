@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { findPublicPostBySlugFromApi } from '@/post/queries/public';
 import { SinglePost } from '@/components/SinglePost';
+import { getCurrentUser, getLoginSessionForApi } from '@/lib/login/manage-login';
+import { findCommentsForPost } from '@/lib/comment/queries';
 
 type PostPageProps = {
   params: Promise<{ slug: string }>;
@@ -36,6 +38,17 @@ export async function generateMetadata({
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
   const post = await getPost(slug);
+  const user = await getCurrentUser();
+  const accessToken = user ? await getLoginSessionForApi() : null;
+  const commentsResponse = await findCommentsForPost(post.id, accessToken);
 
-  return <SinglePost post={post} />;
+  return (
+    <SinglePost
+      post={post}
+      postSlug={slug}
+      currentUser={user ? { id: user.id, name: user.name, isAdmin: user.isAdmin } : null}
+      comments={commentsResponse.success ? commentsResponse.data : []}
+      commentsError={commentsResponse.success ? null : "Comments could not be loaded right now."}
+    />
+  );
 }

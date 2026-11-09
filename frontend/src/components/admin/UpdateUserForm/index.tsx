@@ -7,7 +7,13 @@ import type { SessionUser } from "@/lib/login/manage-login";
 import { useActionToast } from "@/hooks/use-action-toast";
 import { DeleteAccountButton } from "@/components/admin/DeleteAccountButton";
 
-export function UpdateUserForm({ user }: { user: SessionUser }) {
+export function UpdateUserForm({
+  user,
+  passwordHref = "/account/password",
+}: {
+  user: SessionUser;
+  passwordHref?: string;
+}) {
   const [state, action, isPending] = useActionState(updateUserAction, {
     user,
     errors: [],
@@ -41,7 +47,7 @@ export function UpdateUserForm({ user }: { user: SessionUser }) {
       >
         {isPending ? "Saving..." : "Save profile"}
       </button>
-      <Link className="w-fit underline" href="/admin/user/password">
+      <Link className="w-fit underline" href={passwordHref}>
         Change password
       </Link>
       <DeleteAccountButton />

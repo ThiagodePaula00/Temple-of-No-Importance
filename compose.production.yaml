@@ -3,7 +3,7 @@ services:
     image: postgres:18
     restart: unless-stopped
     environment:
-      POSTGRES_DB: posts
+      POSTGRES_DB: templeBlog
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?Set POSTGRES_ADMIN_PASSWORD}
       POSTGRES_APP_PASSWORD: ${POSTGRES_APP_PASSWORD:?Set POSTGRES_APP_PASSWORD}
@@ -13,7 +13,7 @@ services:
     networks:
       - database
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d posts"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d \"$$POSTGRES_DB\""]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -35,10 +35,16 @@ services:
       DB_PORT: 5432
       POSTGRES_USER: posts_app
       POSTGRES_PASSWORD: ${POSTGRES_APP_PASSWORD:?Set POSTGRES_APP_PASSWORD}
-      POSTGRES_DB: posts
+      POSTGRES_DB: templeBlog
       TYPEORM_SYNCHRONIZE: "false"
     ports:
       - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
     depends_on:
       postgres:
         condition: service_healthy
@@ -65,7 +71,8 @@ services:
     ports:
       - "127.0.0.1:3001:3001"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - application
     security_opt:

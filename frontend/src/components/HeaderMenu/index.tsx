@@ -9,6 +9,7 @@ import {
   ShieldCheckIcon,
   ShieldUserIcon,
   UserPlusIcon,
+  UserRoundIcon,
   XIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -83,15 +84,25 @@ export function HeaderMenu({ isAuthenticated, isAdmin }: HeaderMenuProps) {
             </>
           )}
           {isAuthenticated ? (
-            <li>
-              <ConfirmLogoutButton
-                className={itemClass}
-                onConfirmed={closeMenu}
-              >
-                <LogOutIcon aria-hidden="true" />
-                <span>Log out</span>
-              </ConfirmLogoutButton>
-            </li>
+            <>
+              {!isAdmin && (
+                <li>
+                  <Link className={itemClass} href="/account" onClick={closeMenu}>
+                    <UserRoundIcon aria-hidden="true" />
+                    <span>Account</span>
+                  </Link>
+                </li>
+              )}
+              <li>
+                <ConfirmLogoutButton
+                  className={itemClass}
+                  onConfirmed={closeMenu}
+                >
+                  <LogOutIcon aria-hidden="true" />
+                  <span>Log out</span>
+                </ConfirmLogoutButton>
+              </li>
+            </>
           ) : (
             <>
               <li>

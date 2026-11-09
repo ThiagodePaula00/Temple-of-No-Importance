@@ -51,7 +51,32 @@ export class AuthGuard implements CanActivate {
       throw error;
     }
 
+    if (request.user.isBanned) {
+      throw new ForbiddenException("This account has been banned.");
+    }
+
     return true;
+  }
+}
+
+@Injectable()
+export class OptionalAuthGuard extends AuthGuard {
+  constructor(jwt: JwtService, users: UsersService) {
+    super(jwt, users);
+  }
+
+  override async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    if (!request.headers.authorization) return true;
+    try {
+      return await super.canActivate(context);
+    } catch (error) {
+      if (error instanceof ForbiddenException) {
+        request.user = undefined;
+        return true;
+      }
+      throw error;
+    }
   }
 }
 

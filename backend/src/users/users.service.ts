@@ -1,7 +1,13 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
-import { DataSource, Repository } from "typeorm";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+import { DataSource, IsNull, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./user.entity.js";
+import { RefreshToken } from "../auth/refresh-token.entity.js";
 
 @Injectable()
 export class UsersService {
@@ -58,6 +64,36 @@ export class UsersService {
     const user = await this.findById(id);
     user.passwordHash = passwordHash;
     await this.users.save(user);
+  }
+
+  async setBanned(adminId: string, userId: string, banned: boolean) {
+    if (adminId === userId) {
+      throw new BadRequestException("Administrators cannot ban their own account.");
+    }
+
+    return this.dataSource.transaction(async (manager) => {
+      const users = manager.getRepository(User);
+      const user = await users.findOne({
+        where: { id: userId },
+        lock: { mode: "pessimistic_write" },
+      });
+      if (!user) throw new NotFoundException("User not found.");
+      if (user.isAdmin) {
+        throw new BadRequestException("Administrator accounts cannot be banned.");
+      }
+
+      user.isBanned = banned;
+      await users.save(user);
+
+      if (banned) {
+        await manager.getRepository(RefreshToken).update(
+          { userId, revokedAt: IsNull() },
+          { revokedAt: new Date() },
+        );
+      }
+
+      return { id: user.id, isBanned: user.isBanned };
+    });
   }
 
   async remove(id: string) {

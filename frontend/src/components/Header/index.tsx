@@ -8,6 +8,7 @@ import {
   ShieldCheckIcon,
   ShieldUserIcon,
   UserPlusIcon,
+  UserRoundIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -87,12 +88,18 @@ return (
           )}
 
           {isAuthenticated ? (
-            <div>
+            <>
+              {!isAdmin && (
+                <Link className={iconLinkClass} href="/account" title="Account">
+                  <UserRoundIcon aria-hidden="true" />
+                  <span>Account</span>
+                </Link>
+              )}
               <ConfirmLogoutButton className={iconLinkClass}>
                 <LogOutIcon aria-hidden="true" />
                 <span>Log out</span>
               </ConfirmLogoutButton>
-            </div>
+            </>
           ) : (
             <>
               <Link className={iconLinkClass} href="/sign-in" title="Sign in">

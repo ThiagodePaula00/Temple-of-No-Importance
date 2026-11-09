@@ -12,7 +12,8 @@ export function DeleteAccountButton() {
     confirmWithToast({
       toastId: "confirm-delete-account",
       title: "Delete your account?",
-      message: "This action cannot be undone. Your account will be removed.",
+      message:
+        "Are you sure you want to delete your account? This cannot be undone. Your account, comments, replies in their threads, and sign-in sessions will be removed. Your posts and uploaded images will remain.",
       confirmLabel: isPending ? "Please wait…" : "Delete account",
       destructive: true,
       onConfirm: () => {
