@@ -28,6 +28,9 @@ export function HeaderSearch({
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Post[]>([]);
+  const [searchStatus, setSearchStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
   useEffect(() => {
     if (isOpen) {
@@ -36,28 +39,58 @@ export function HeaderSearch({
   }, [isOpen]);
 
   useEffect(() => {
-    if (!query.trim()) return;
+    const searchTerm = query.trim();
+    if (!searchTerm) {
+      setResults([]);
+      setSearchStatus("idle");
+      return;
+    }
+
+    const controller = new AbortController();
+    setResults([]);
+    setSearchStatus("loading");
 
     const fetchPosts = async () => {
       try {
-        const apiOrigin = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
-        const res = await fetch(`${apiOrigin}/posts?q=${encodeURIComponent(query)}`);
-        if (res.ok) {
-          const data = await res.json();
+        const res = await fetch(
+          `/api/posts?q=${encodeURIComponent(searchTerm)}`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          },
+        );
+        if (!res.ok) throw new Error(`Search failed with HTTP ${res.status}`);
+
+        const data: unknown = await res.json();
+        if (!Array.isArray(data)) {
+          throw new Error("Search returned an invalid response");
+        }
+
+        if (!controller.signal.aborted) {
           setResults(data);
+          setSearchStatus("success");
         }
       } catch (error) {
-        console.error("Erro ao buscar posts:", error);
+        if (!controller.signal.aborted) {
+          console.error("Post search failed:", error);
+          setSearchStatus("error");
+        }
       }
     };
 
     const timer = setTimeout(fetchPosts, 300);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [query]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         if (!query.trim()) {
           onOpenChange(false);
         }
@@ -89,7 +122,10 @@ export function HeaderSearch({
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
-            if (!e.target.value.trim()) setResults([]);
+            if (!e.target.value.trim()) {
+              setResults([]);
+              setSearchStatus("idle");
+            }
           }}
         />
         <button
@@ -104,6 +140,7 @@ export function HeaderSearch({
 
         <SearchResultsDropdown
           results={results}
+          status={searchStatus}
           onSelect={() => {
             onOpenChange(false);
             setQuery("");
