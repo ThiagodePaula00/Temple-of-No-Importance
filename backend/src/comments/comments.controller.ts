@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Query,
   Req,
@@ -14,7 +15,6 @@ import {
 } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
 import {
-  AdminGuard,
   AuthGuard,
   OptionalAuthGuard,
   type AuthenticatedRequest,
@@ -22,6 +22,7 @@ import {
 import {
   CreateCommentDto,
   GetCommentsDto,
+  UpdateCommentDto,
   VoteCommentDto,
 } from "./comment.dto.js";
 import { CommentsService } from "./comments.service.js";
@@ -63,10 +64,23 @@ export class CommentsController {
     return this.comments.vote(id, request.user!.id, body.vote);
   }
 
+  @Patch(":id")
+  @UseGuards(AuthGuard)
+  update(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() body: UpdateCommentDto,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.comments.update(id, request.user!.id, body.body);
+  }
+
   @Delete(":id")
-  @UseGuards(AuthGuard, AdminGuard)
+  @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param("id", ParseUUIDPipe) id: string) {
-    return this.comments.remove(id);
+  remove(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.comments.remove(id, request.user!.id, request.user!.isAdmin);
   }
 }

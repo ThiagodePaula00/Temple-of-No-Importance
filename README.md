@@ -100,6 +100,7 @@ For a new or existing production database, start PostgreSQL first and apply the 
 ```sh
 docker compose --env-file .env.production -f compose.production.yaml up -d postgres
 docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d posts < backend/migrations/001-comments-and-account-bans.sql
+docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d posts < backend/migrations/002-cascade-delete-comment-replies.sql
 docker compose --env-file .env.production -f compose.production.yaml up --build -d
 ```
 
@@ -120,8 +121,9 @@ Next.js adds a per-request nonce-based CSP, denies framing, and sets content-typ
 - Register at `/sign-up` and sign in at `/sign-in`.
 - The first account created in an empty database becomes the administrator. Later accounts are regular users and cannot access administrator features.
 - Administrators can open `/admin`, create posts at `/admin/post/new`, edit posts, filter posts by published or draft status, and manage their profile and password.
-- Signed-in users can comment on published posts, reply in threads, and like or dislike comments. Administrators can remove comments and ban or unban non-administrator accounts; banning revokes the user's refresh sessions and blocks existing access tokens.
-- Comments are plain text, limited to 2,000 characters, and rendered as text rather than HTML. Replies are limited to five levels.
+- Signed-in users can comment on published posts, reply in threads, edit or delete their own comments, and like or dislike comments. Reply threads can be collapsed, and their visual indentation stops after six levels. Administrators can remove any comment and ban or unban non-administrator accounts; banning revokes the user's refresh sessions and blocks existing access tokens.
+- Comments are plain text, limited to 2,000 characters, and rendered as text rather than HTML. Threads are limited to 20 levels.
+- Every signed-in user has an Account panel to update their name and email, change their password using the current password, or delete their account. Posts and uploaded images remain if their author deletes an account.
 - Posts are drafts by default unless **Publish now** is selected. Only published posts appear on the public site.
 - Passwords must contain at least 8 characters, including an uppercase letter, a lowercase letter, a number, and a special character. They are limited to 72 bytes.
 - Password recovery by email is not configured. Contact the site operator if administrator access needs to be recovered.
@@ -174,7 +176,8 @@ The API provides:
 | `GET /comments?postId=...` | Public | List comments on a published post; authenticated requests also include the viewer's vote |
 | `POST /comments` | Authenticated | Add a comment or reply to a published post |
 | `POST /comments/:id/vote` | Authenticated | Set or remove a like/dislike on a comment |
-| `DELETE /comments/:id` | Administrator | Delete a comment and preserve its replies |
+| `PATCH /comments/:id` | Author | Edit your own comment |
+| `DELETE /comments/:id` | Author or administrator | Delete a comment and all replies in its thread |
 | `PATCH /users/:id/ban` | Administrator | Ban or unban a non-administrator account |
 | `POST /upload` | Administrator | Upload and convert an image |
 | `GET /uploads/:filename` | Public | Retrieve an uploaded image |

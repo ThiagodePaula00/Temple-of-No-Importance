@@ -35,7 +35,7 @@ export class Comment {
 
   @ManyToOne(() => Comment, (comment) => comment.replies, {
     nullable: true,
-    onDelete: "SET NULL",
+    onDelete: "CASCADE",
   })
   @JoinColumn({ name: "parent_id" })
   parent: Comment | null;

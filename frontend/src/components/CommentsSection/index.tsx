@@ -4,8 +4,12 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import {
+  ChevronDownIcon,
+  ChevronUpIcon,
   MessageSquareIcon,
+  PencilLineIcon,
   ThumbsDownIcon,
   ThumbsUpIcon,
   Trash2Icon,
@@ -13,9 +17,11 @@ import {
   UserRoundXIcon,
 } from "lucide-react";
 import { PostDate } from "@/components/PostDate";
+import { confirmWithToast } from "@/utils/toast-confirm";
 import {
   createCommentAction,
   deleteCommentAction,
+  editCommentAction,
   setCommentAuthorBannedAction,
   voteCommentAction,
 } from "@/actions/comment/comment-actions";
@@ -59,6 +65,11 @@ export function CommentsSection({
   const [body, setBody] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyBody, setReplyBody] = useState("");
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editBody, setEditBody] = useState("");
+  const [collapsedReplies, setCollapsedReplies] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const commentTree = useMemo(() => makeCommentTree(comments), [comments]);
@@ -78,7 +89,11 @@ export function CommentsSection({
         body: commentBody,
       });
       if (!result.success) {
-        setError(result.error);
+        if (result.rateLimited) {
+          toast.warning(result.error, { toastId: "comment-rate-limit" });
+        } else {
+          setError(result.error);
+        }
         return;
       }
 
@@ -106,13 +121,37 @@ export function CommentsSection({
     });
   }
 
-  function removeComment(commentId: string) {
-    if (!window.confirm("Delete this comment and keep its replies?")) return;
+  function saveEdit(commentId: string) {
+    const updatedBody = editBody.trim();
+    if (!updatedBody) return;
     setError(null);
     startTransition(async () => {
-      const result = await deleteCommentAction(commentId, postSlug);
-      if (!result.success) setError(result.error);
-      else router.refresh();
+      const result = await editCommentAction(commentId, postSlug, updatedBody);
+      if (!result.success) {
+        setError(result.error);
+        return;
+      }
+      setEditingComment(null);
+      setEditBody("");
+      router.refresh();
+    });
+  }
+
+  function removeComment(commentId: string) {
+    confirmWithToast({
+      toastId: `confirm-delete-comment-${commentId}`,
+      title: "Delete comment?",
+      message: "Delete this comment and all of its replies?",
+      confirmLabel: "Delete comment",
+      destructive: true,
+      onConfirm: () => {
+        setError(null);
+        startTransition(async () => {
+          const result = await deleteCommentAction(commentId, postSlug);
+          if (!result.success) setError(result.error);
+          else router.refresh();
+        });
+      },
     });
   }
 
@@ -142,9 +181,54 @@ export function CommentsSection({
             )}
             <span aria-hidden="true" className="text-(--muted-text-color)">·</span>
             <PostDate dateTime={comment.createdAt} />
+            {new Date(comment.updatedAt).getTime() >
+              new Date(comment.createdAt).getTime() && (
+                <span className="text-xs text-(--muted-text-color)">(edited)</span>
+              )}
           </header>
 
-          <p className="break-words whitespace-pre-wrap leading-relaxed">{comment.body}</p>
+          {editingComment === comment.id ? (
+            <form
+              className="grid gap-3"
+              onSubmit={(event) => {
+                event.preventDefault();
+                saveEdit(comment.id);
+              }}
+            >
+              <label className="sr-only" htmlFor={`edit-${comment.id}`}>
+                Edit your comment
+              </label>
+              <textarea
+                autoFocus
+                className="min-h-24 w-full resize-y rounded-md border border-(--control-border) bg-(--control-background) px-3 py-2 text-inherit outline-none focus:border-blue-500"
+                id={`edit-${comment.id}`}
+                maxLength={2000}
+                onChange={(event) => setEditBody(event.target.value)}
+                value={editBody}
+              />
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs text-(--muted-text-color)">{editBody.length}/2000</span>
+                <div className="flex gap-2">
+                  <button
+                    className="rounded-md border border-(--control-border) px-3 py-2 text-sm hover:bg-(--menu-background)"
+                    onClick={() => setEditingComment(null)}
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                    disabled={isPending || !editBody.trim()}
+                    type="submit"
+                  >
+                    Save edit
+                  </button>
+                </div>
+              </div>
+            </form>
+          ) : (
+            <p className="break-words whitespace-pre-wrap leading-relaxed">{comment.body}</p>
+          )}
 
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
             <button
@@ -184,7 +268,22 @@ export function CommentsSection({
                 Reply
               </button>
             )}
-            {currentUser?.isAdmin && (
+            {currentUser?.id === comment.author.id && editingComment !== comment.id && (
+              <button
+                className="inline-flex cursor-pointer items-center gap-1.5 text-(--muted-text-color) transition-colors hover:text-(--text-color) disabled:opacity-50"
+                disabled={isPending}
+                onClick={() => {
+                  setEditingComment(comment.id);
+                  setEditBody(comment.body);
+                  setError(null);
+                }}
+                type="button"
+              >
+                <PencilLineIcon aria-hidden="true" className="size-4" />
+                Edit
+              </button>
+            )}
+            {currentUser && (currentUser.isAdmin || currentUser.id === comment.author.id) && (
               <button
                 className="inline-flex cursor-pointer items-center gap-1.5 text-red-500 transition-colors hover:text-red-400 disabled:opacity-50"
                 disabled={isPending}
@@ -208,6 +307,29 @@ export function CommentsSection({
                   <UserRoundXIcon aria-hidden="true" className="size-4" />
                 )}
                 {comment.author.isBanned ? "Unban author" : "Ban author"}
+              </button>
+            )}
+            {comment.replies.length > 0 && (
+              <button
+                aria-controls={`comment-replies-${comment.id}`}
+                aria-expanded={!collapsedReplies.has(comment.id)}
+                className="inline-flex cursor-pointer items-center gap-1.5 text-(--muted-text-color) transition-colors hover:text-(--text-color)"
+                onClick={() => {
+                  setCollapsedReplies((current) => {
+                    const next = new Set(current);
+                    if (next.has(comment.id)) next.delete(comment.id);
+                    else next.add(comment.id);
+                    return next;
+                  });
+                }}
+                type="button"
+              >
+                {collapsedReplies.has(comment.id) ? (
+                  <ChevronDownIcon aria-hidden="true" className="size-4" />
+                ) : (
+                  <ChevronUpIcon aria-hidden="true" className="size-4" />
+                )}
+                {collapsedReplies.has(comment.id) ? "Show" : "Hide"} replies ({comment.replies.length})
               </button>
             )}
           </div>
@@ -255,8 +377,11 @@ export function CommentsSection({
           )}
         </article>
 
-        {comment.replies.length > 0 && (
-          <ul className={`mt-3 grid gap-3 border-l border-(--control-border) pl-3 sm:pl-5 ${depth >= 4 ? "ml-2" : "ml-3 sm:ml-5"}`}>
+        {comment.replies.length > 0 && !collapsedReplies.has(comment.id) && (
+          <ul
+            className={`mt-3 grid gap-3 ${depth < 6 ? "ml-3 border-l border-(--control-border) pl-3 sm:ml-5 sm:pl-5" : "border-l-0 pl-0"}`}
+            id={`comment-replies-${comment.id}`}
+          >
             {comment.replies.map((reply) => renderComment(reply, depth + 1))}
           </ul>
         )}

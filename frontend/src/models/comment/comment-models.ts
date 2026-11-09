@@ -6,6 +6,7 @@ export type CommentModel = {
   parentId: string | null;
   body: string;
   createdAt: string;
+  updatedAt: string;
   author: {
     id: string;
     name: string;

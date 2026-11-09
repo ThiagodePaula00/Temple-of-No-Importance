@@ -26,6 +26,13 @@ export class CreateCommentDto {
   body: string;
 }
 
+export class UpdateCommentDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(2000)
+  body: string;
+}
+
 export class VoteCommentDto {
   @IsIn(["like", "dislike", null])
   vote: "like" | "dislike" | null;

@@ -2,7 +2,11 @@ import { getCurrentUser } from "@/lib/login/manage-login";
 import ErrorMessage from "@/components/ErrorMessage";
 import { UpdateUserForm } from "@/components/admin/UpdateUserForm";
 
-export async function UpdateUser() {
+export async function UpdateUser({
+  passwordHref = "/account/password",
+}: {
+  passwordHref?: string;
+}) {
   const user = await getCurrentUser();
 
   if (!user) {
@@ -14,5 +18,5 @@ export async function UpdateUser() {
     );
   }
 
-  return <UpdateUserForm user={user} />;
+  return <UpdateUserForm user={user} passwordHref={passwordHref} />;
 }

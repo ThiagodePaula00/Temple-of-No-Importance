@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -11,7 +12,7 @@ import { Comment } from "./comment.entity.js";
 import { CommentVote, type CommentVoteValue } from "./comment-vote.entity.js";
 import { CreateCommentDto } from "./comment.dto.js";
 
-const MAX_THREAD_DEPTH = 5;
+const MAX_THREAD_DEPTH = 20;
 const MAX_COMMENTS = 200;
 
 @Injectable()
@@ -66,6 +67,7 @@ export class CommentsService {
         parentId: comment.parentId,
         body: comment.body,
         createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
         author: {
           id: comment.author.id,
           name: comment.author.name,
@@ -120,6 +122,7 @@ export class CommentsService {
       parentId: saved.parentId,
       body: saved.body,
       createdAt: saved.createdAt,
+      updatedAt: saved.updatedAt,
       author: { id: author.id, name: author.name },
       likeCount: 0,
       dislikeCount: 0,
@@ -152,9 +155,31 @@ export class CommentsService {
     });
   }
 
-  async remove(commentId: string) {
-    const result = await this.comments.delete(commentId);
-    if (!result.affected) throw new NotFoundException("Comment not found.");
+  async update(commentId: string, userId: string, body: string) {
+    const comment = await this.comments.findOne({ where: { id: commentId } });
+    if (!comment) throw new NotFoundException("Comment not found.");
+    if (comment.authorId !== userId) {
+      throw new ForbiddenException("You can only edit your own comments.");
+    }
+
+    const normalizedBody = body.trim();
+    if (!normalizedBody) throw new BadRequestException("Comment cannot be empty.");
+    if (normalizedBody.length > 2000) {
+      throw new BadRequestException("Comments must be 2,000 characters or fewer.");
+    }
+
+    comment.body = normalizedBody;
+    return this.comments.save(comment);
+  }
+
+  async remove(commentId: string, userId: string, isAdmin: boolean) {
+    const comment = await this.comments.findOne({ where: { id: commentId } });
+    if (!comment) throw new NotFoundException("Comment not found.");
+    if (!isAdmin && comment.authorId !== userId) {
+      throw new ForbiddenException("You can only delete your own comments.");
+    }
+
+    await this.comments.remove(comment);
   }
 
   private async getDepth(comment: Comment) {
