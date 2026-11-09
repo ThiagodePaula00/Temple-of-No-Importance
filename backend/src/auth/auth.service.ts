@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
@@ -41,6 +42,9 @@ export class AuthService {
     if (!user || !(await compare(password, user.passwordHash))) {
       throw new UnauthorizedException("The email or password is incorrect.");
     }
+    if (user.isBanned) {
+      throw new ForbiddenException("This account has been banned.");
+    }
 
     return { ...(await this.issueTokenPair(user)), user: toPublicUser(user) };
   }
@@ -67,7 +71,7 @@ export class AuthService {
         .getRepository(User)
         .findOneBy({ id: currentToken.userId });
 
-      if (!user) {
+      if (!user || user.isBanned) {
         throw new UnauthorizedException("The refresh token is invalid or has expired.");
       }
 

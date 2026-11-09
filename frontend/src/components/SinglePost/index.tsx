@@ -3,12 +3,25 @@ import { PostModel } from '@/models/post/post-models';
 import { PostDate } from '../PostDate';
 import { SafeMarkdown } from '../SafeMarkdown';
 import { coverImageSrc } from '@/utils/cover-image-src';
+import { SharePostButton } from '@/components/SharePostButton';
+import { CommentsSection } from '@/components/CommentsSection';
+import type { CommentModel } from '@/models/comment/comment-models';
 
 type SinglePostProps = {
   post: PostModel;
+  postSlug: string;
+  currentUser: { id: string; name: string; isAdmin: boolean } | null;
+  comments: CommentModel[];
+  commentsError: string | null;
 };
 
-export function SinglePost({ post }: SinglePostProps) {
+export function SinglePost({
+  post,
+  postSlug,
+  currentUser,
+  comments,
+  commentsError,
+}: SinglePostProps) {
   return (
     <main className="mx-auto w-full max-w-4xl px-6 pb-16">
       <article className="flex flex-col gap-6">
@@ -38,6 +51,20 @@ export function SinglePost({ post }: SinglePostProps) {
 
         <SafeMarkdown markdown={post.content} />
       </article>
+
+      <div className="mt-8 border-t border-(--text-color) pt-6">
+        <SharePostButton />
+      </div>
+
+      <section className="mt-8 border-t border-(--text-color) pt-8">
+        <CommentsSection
+          postId={post.id}
+          postSlug={postSlug}
+          currentUser={currentUser}
+          initialComments={comments}
+          loadError={commentsError}
+        />
+      </section>
     </main>
   );
 }

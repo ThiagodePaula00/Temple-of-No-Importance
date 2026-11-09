@@ -11,6 +11,7 @@ Temple of No Importance is a personal blog about philosophy and related subjects
 - Public homepage with a featured post and a list of recent published posts.
 - Individual post pages with cover images, author and publication details, and Markdown content.
 - Search across published post content.
+- Authenticated comments with threaded replies, likes, dislikes, and administrator moderation.
 - Light and dark themes, responsive navigation, and a mobile menu.
 - Account registration and sign-in. The first registered account becomes the administrator; later accounts are regular users.
 - Protected administration pages for creating, editing, publishing, unpublishing, filtering, and deleting posts.
@@ -30,7 +31,7 @@ The frontend runs at `http://localhost:3001` and calls the API at `http://localh
 
 The public API returns only published posts. Administrative API routes require a valid access token and administrator role. The frontend keeps access and refresh tokens in HttpOnly cookies. Access tokens last 15 minutes; refresh tokens last 7 days, rotate when refreshed, and are stored in the database as SHA-256 hashes. Passwords are hashed with bcrypt.
 
-TypeORM schema synchronization defaults to enabled outside production and disabled in production. This project does not yet include database migrations, so provision the production schema before starting the production backend. Do not enable `TYPEORM_SYNCHRONIZE` in a production environment.
+TypeORM schema synchronization defaults to enabled outside production and disabled in production. Do not enable `TYPEORM_SYNCHRONIZE` in a production environment. Apply checked-in SQL migrations as the PostgreSQL administrator before starting production services.
 
 The backend rejects the example JWT secret, and production startup also rejects the example database password. Replace both placeholders in `backend/.env` before deployment.
 
@@ -94,6 +95,14 @@ Start production with:
 docker compose --env-file .env.production -f compose.production.yaml up --build -d
 ```
 
+For a new or existing production database, start PostgreSQL first and apply the comments and account-ban migration before starting the API:
+
+```sh
+docker compose --env-file .env.production -f compose.production.yaml up -d postgres
+docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d posts < backend/migrations/001-comments-and-account-bans.sql
+docker compose --env-file .env.production -f compose.production.yaml up --build -d
+```
+
 The production API and frontend bind to loopback so a host reverse proxy can serve them over HTTPS. Configure it to route the public API origin to the backend and the site to the frontend. The backend database role `posts_app` is non-superuser and only receives schema and application data permissions; keep the separate PostgreSQL administrator secret private. Production TypeORM synchronization is disabled. The current project has no migration workflow, so provision the schema before deployment.
 
 The role-creation script runs only when PostgreSQL initializes an empty data volume. If you attach an existing volume, create `posts_app` and grant its schema/table/sequence permissions manually before starting the backend.
@@ -111,6 +120,8 @@ Next.js adds a per-request nonce-based CSP, denies framing, and sets content-typ
 - Register at `/sign-up` and sign in at `/sign-in`.
 - The first account created in an empty database becomes the administrator. Later accounts are regular users and cannot access administrator features.
 - Administrators can open `/admin`, create posts at `/admin/post/new`, edit posts, filter posts by published or draft status, and manage their profile and password.
+- Signed-in users can comment on published posts, reply in threads, and like or dislike comments. Administrators can remove comments and ban or unban non-administrator accounts; banning revokes the user's refresh sessions and blocks existing access tokens.
+- Comments are plain text, limited to 2,000 characters, and rendered as text rather than HTML. Replies are limited to five levels.
 - Posts are drafts by default unless **Publish now** is selected. Only published posts appear on the public site.
 - Passwords must contain at least 8 characters, including an uppercase letter, a lowercase letter, a number, and a special character. They are limited to 72 bytes.
 - Password recovery by email is not configured. Contact the site operator if administrator access needs to be recovered.
@@ -145,7 +156,7 @@ The API provides:
 | Method and path | Access | Purpose |
 | --- | --- | --- |
 | `GET /health` | Public | Health check |
-| `GET /posts?q=...` | Public | List published posts; optional search over post content |
+| `GET /posts?q=...` | Public | List published posts; optional search over title, excerpt, and content |
 | `GET /posts/:slug` | Public | Read one published post |
 | `POST /auth/sign-up` | Public | Register an account; the first account becomes administrator |
 | `POST /auth/sign-in` | Public | Sign in and issue tokens |
@@ -160,6 +171,11 @@ The API provides:
 | `POST /posts` | Administrator | Create a post |
 | `PATCH /posts/:id` | Administrator | Update a post |
 | `DELETE /posts/:id` | Administrator | Delete a post |
+| `GET /comments?postId=...` | Public | List comments on a published post; authenticated requests also include the viewer's vote |
+| `POST /comments` | Authenticated | Add a comment or reply to a published post |
+| `POST /comments/:id/vote` | Authenticated | Set or remove a like/dislike on a comment |
+| `DELETE /comments/:id` | Administrator | Delete a comment and preserve its replies |
+| `PATCH /users/:id/ban` | Administrator | Ban or unban a non-administrator account |
 | `POST /upload` | Administrator | Upload and convert an image |
 | `GET /uploads/:filename` | Public | Retrieve an uploaded image |
 
@@ -186,8 +202,8 @@ The frontend defaults to an API at `http://localhost:3000`; set `POSTS_API_URL` 
 ## Project structure
 
 ```text
-backend/       NestJS API, authentication, posts, uploads, and REST Client examples
-frontend/      Next.js blog, admin interface, Markdown renderer, and API routes
+backend/       NestJS API, authentication, comments, posts, uploads, and REST Client examples
+frontend/      Next.js blog, comments, admin interface, Markdown renderer, and API routes
 compose.yaml   Production-oriented Docker Compose services and persistent volumes
 README.md      Project setup and feature documentation
 ```
