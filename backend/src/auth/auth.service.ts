@@ -107,6 +107,11 @@ export class AuthService {
     currentPassword: string,
     newPassword: string,
   ) {
+    if (!user.isAdmin) {
+      throw new ForbiddenException(
+        "Regular users need an approved password change request.",
+      );
+    }
     this.validatePasswordLength(newPassword);
     const currentUser = await this.users.findById(user.id);
 

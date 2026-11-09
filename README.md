@@ -101,16 +101,17 @@ For a new or existing production database, start PostgreSQL first and apply the 
 docker compose --env-file .env.production -f compose.production.yaml up -d postgres
 docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d posts < backend/migrations/001-comments-and-account-bans.sql
 docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d posts < backend/migrations/002-cascade-delete-comment-replies.sql
+docker compose --env-file .env.production -f compose.production.yaml exec -T postgres psql -U postgres -d posts < backend/migrations/003-password-change-requests.sql
 docker compose --env-file .env.production -f compose.production.yaml up --build -d
 ```
 
-The production API and frontend bind to loopback so a host reverse proxy can serve them over HTTPS. Configure it to route the public API origin to the backend and the site to the frontend. The backend database role `posts_app` is non-superuser and only receives schema and application data permissions; keep the separate PostgreSQL administrator secret private. Production TypeORM synchronization is disabled. The current project has no migration workflow, so provision the schema before deployment.
+The production API and frontend bind to loopback so a host reverse proxy can serve them over HTTPS. Configure it to route the public API origin to the backend and the site to the frontend. The backend database role `posts_app` is non-superuser and only receives schema and application data permissions; keep the separate PostgreSQL administrator secret private. Production TypeORM synchronization is disabled; apply the checked-in SQL migrations manually before deployment.
 
 The role-creation script runs only when PostgreSQL initializes an empty data volume. If you attach an existing volume, create `posts_app` and grant its schema/table/sequence permissions manually before starting the backend.
 
 ### Rate limits and HTTP security
 
-The API uses `@nestjs/throttler`: default 120 requests per 60 seconds per client IP, sign-up/sign-in 5 per minute, refresh/logout 10 per minute, public post search 30 per minute, and uploads 10 per minute. Set `RATE_LIMIT_MAX` and `RATE_LIMIT_TTL_MS` in the backend environment to tune the global limit. Authentication uses a short IP-based request cap and deliberately has no account lockout, avoiding attacker-triggered account denial of service. There is no password recovery endpoint yet.
+The API uses `@nestjs/throttler`: default 120 requests per 60 seconds per client IP, sign-up/sign-in 5 per minute, refresh/logout 10 per minute, public post search 30 per minute, uploads 10 per minute, and password change requests 3 per hour. Set `RATE_LIMIT_MAX` and `RATE_LIMIT_TTL_MS` in the backend environment to tune the global limit. Authentication uses a short IP-based request cap and deliberately has no account lockout, avoiding attacker-triggered account denial of service. Email-based recovery for users who cannot sign in is not configured.
 
 Rate-limit storage is in memory because the supplied Compose deployment runs one backend replica. Do not scale the API horizontally until a shared `@nestjs/throttler` storage backend such as Redis is configured; separate replicas otherwise enforce separate counters. Configure `TRUSTED_PROXIES` with only the reverse proxy IP addresses/CIDRs. It is empty by default, so client-supplied `X-Forwarded-For` is not trusted.
 
@@ -120,10 +121,10 @@ Next.js adds a per-request nonce-based CSP, denies framing, and sets content-typ
 
 - Register at `/sign-up` and sign in at `/sign-in`.
 - The first account created in an empty database becomes the administrator. Later accounts are regular users and cannot access administrator features.
-- Administrators can open `/admin`, create posts at `/admin/post/new`, edit posts, filter posts by published or draft status, and manage their profile and password.
+- Administrators can open `/admin`, create posts at `/admin/post/new`, edit posts, filter posts by published or draft status, manage their profile and password, and approve or deny password change requests at `/admin/password-requests`.
 - Signed-in users can comment on published posts, reply in threads, edit or delete their own comments, and like or dislike comments. Reply threads can be collapsed, and their visual indentation stops after six levels. Administrators can remove any comment and ban or unban non-administrator accounts; banning revokes the user's refresh sessions and blocks existing access tokens.
 - Comments are plain text, limited to 2,000 characters, and rendered as text rather than HTML. Threads are limited to 20 levels.
-- Every signed-in user has an Account panel to update their name and email, change their password using the current password, or delete their account. Posts and uploaded images remain if their author deletes an account.
+- Regular users have an Account panel to update their name and email, request a password change for administrator approval, and delete their account. After approval, they set the new password themselves; the proposed password is never sent to or stored for the administrator. Admins keep direct password changes in their admin Account panel. Posts and uploaded images remain if their author deletes an account.
 - Posts are drafts by default unless **Publish now** is selected. Only published posts appear on the public site.
 - Passwords must contain at least 8 characters, including an uppercase letter, a lowercase letter, a number, and a special character. They are limited to 72 bytes.
 - Password recovery by email is not configured. Contact the site operator if administrator access needs to be recovered.
@@ -166,8 +167,13 @@ The API provides:
 | `POST /auth/logout` | Public, refresh token required | Revoke a refresh token |
 | `GET /auth/me` | Authenticated | Read the current account |
 | `PATCH /auth/me` | Authenticated | Update account name and email |
-| `PATCH /auth/me/password` | Authenticated | Change password and revoke active sessions |
+| `PATCH /auth/me/password` | Administrator | Change password and revoke active sessions |
 | `DELETE /auth/me` | Authenticated | Delete the current account |
+| `GET /password-change-requests/mine` | Authenticated | Read your latest password change request |
+| `POST /password-change-requests` | Authenticated regular user | Ask an administrator to approve a password change (3 requests per hour) |
+| `POST /password-change-requests/complete` | Authenticated regular user with approval | Set a new password and revoke refresh sessions |
+| `GET /password-change-requests` | Administrator | List pending password change requests |
+| `PATCH /password-change-requests/:id` | Administrator | Approve or deny a pending request |
 | `GET /posts/admin` | Administrator | List posts including drafts |
 | `GET /posts/admin/:id` | Administrator | Read a post by ID, including drafts |
 | `POST /posts` | Administrator | Create a post |

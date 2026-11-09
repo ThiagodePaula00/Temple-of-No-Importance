@@ -227,7 +227,7 @@ export function CommentsSection({
               </div>
             </form>
           ) : (
-            <p className="break-words whitespace-pre-wrap leading-relaxed">{comment.body}</p>
+            <p className="wrap-break-word whitespace-pre-wrap leading-relaxed">{comment.body}</p>
           )}
 
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">

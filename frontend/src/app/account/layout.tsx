@@ -9,6 +9,7 @@ type AccountLayoutProps = {
 export default async function AccountLayout({ children }: AccountLayoutProps) {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in?next=%2Faccount");
+  if (user.isAdmin) redirect("/admin/user");
 
   return (
     <main className="mx-auto w-full max-w-4xl px-4 pb-16 sm:px-6">

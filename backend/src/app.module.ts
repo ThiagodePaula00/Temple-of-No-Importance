@@ -19,6 +19,8 @@ import { positiveInteger } from './security-config.js';
 import { Comment } from './comments/comment.entity.js';
 import { CommentVote } from './comments/comment-vote.entity.js';
 import { CommentsModule } from './comments/comments.module.js';
+import { PasswordChangeRequest } from './password-requests/password-change-request.entity.js';
+import { PasswordRequestsModule } from './password-requests/password-requests.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -49,7 +51,14 @@ if (
       username: process.env.POSTGRES_USER ?? "posts",
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB?? "posts",
-      entities: [Post, User, RefreshToken, Comment, CommentVote],
+      entities: [
+        Post,
+        User,
+        RefreshToken,
+        Comment,
+        CommentVote,
+        PasswordChangeRequest,
+      ],
       synchronize: synchronizeSchema,
       retryAttempts: 10,
       retryDelay: 3000,
@@ -61,6 +70,7 @@ if (
     PostModule,
     AuthModule,
     CommentsModule,
+    PasswordRequestsModule,
     UploadModule,
   ],
   controllers: [AppController, HealthController],

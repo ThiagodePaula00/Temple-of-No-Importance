@@ -9,7 +9,7 @@ export default function AdminUserPage() {
   return (
     <section>
       <h1 className="mb-6 text-2xl font-bold text-center">Your account</h1>
-      <UpdateUser />
+      <UpdateUser passwordHref="/admin/user/password" />
     </section>
   );
 }
